@@ -1,0 +1,58 @@
+# ── Python ─────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Django ──────────────────────────────────────
+*.log
+local_settings.py
+db.sqlite3
+staticfiles/
+media/
+htmlcov/
+.coverage
+coverage.xml
+
+# ── Environment ─────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Secrets ─────────────────────────────────────
+config/firebase_credentials.json
+*.pem
+*.key
+
+# ── Node / Frontend ─────────────────────────────
+node_modules/
+.npm
+.next/
+out/
+build/
+*.tsbuildinfo
+
+# ── React Native ────────────────────────────────
+mobile/.expo/
+mobile/ios/Pods/
+mobile/android/.gradle/
+mobile/android/app/build/
+
+# ── IDE ─────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Docker ──────────────────────────────────────
+docker-compose.override.yml

@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ETIP — System Architecture v1</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Sora:wght@300;400;600;700;800&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#F5A623;--gold2:#FFD166;--amber:#E08C00;
+  --dark:#070B14;--dark2:#0D1525;--dark3:#111827;
+  --panel:#141C2E;--panel2:#1A2540;--border:rgba(245,166,35,.18);
+  --blue:#3B82F6;--green:#10B981;--red:#EF4444;--purple:#8B5CF6;
+  --text:#F0F4FF;--muted:#8B98B8;--white:#FFFFFF;
+}
+html,body{width:100%;height:100%;background:var(--dark);font-family:'Inter',sans-serif;color:var(--text);overflow:hidden}
+.deck{width:100vw;height:100vh;position:relative}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .55s cubic-bezier(.4,0,.2,1),transform .55s cubic-bezier(.4,0,.2,1);transform:translateX(60px);overflow:hidden}
+.slide.active{opacity:1;pointer-events:all;transform:translateX(0)}
+.slide.exit{opacity:0;transform:translateX(-60px)}
+.slide-inner{flex:1;display:flex;flex-direction:column;padding:44px 64px 32px;position:relative;overflow:hidden}
+.slide-inner>*{position:relative;z-index:1}
+.bg-grid{position:absolute;inset:0;z-index:0;background-image:linear-gradient(rgba(245,166,35,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(245,166,35,.04) 1px,transparent 1px);background-size:60px 60px}
+.bg-glow{position:absolute;border-radius:50%;filter:blur(110px);z-index:0;pointer-events:none}
+.glow-gold{background:rgba(245,166,35,.18)}.glow-blue{background:rgba(59,130,246,.14)}.glow-green{background:rgba(16,185,129,.12)}.glow-purple{background:rgba(139,92,246,.12)}
+.tag{display:inline-flex;align-items:center;gap:7px;background:rgba(245,166,35,.12);border:1px solid var(--border);color:var(--gold);padding:5px 14px;border-radius:50px;font-size:11px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase}
+h1{font-family:'Sora',sans-serif;font-size:clamp(34px,4.5vw,64px);font-weight:800;line-height:1.05;letter-spacing:-1.5px}
+h2{font-family:'Sora',sans-serif;font-size:clamp(22px,2.6vw,38px);font-weight:700;line-height:1.1;letter-spacing:-.8px}
+h3{font-size:15px;font-weight:700}
+.accent{color:var(--gold)}.gradient-text{background:linear-gradient(130deg,#F5A623 0%,#FFD166 50%,#FF8C00 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.muted{color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px 22px}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:50px;font-size:11px;font-weight:600}
+.badge-green{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+.badge-gold{background:rgba(245,166,35,.15);color:var(--gold);border:1px solid rgba(245,166,35,.3)}
+.badge-blue{background:rgba(59,130,246,.15);color:var(--blue);border:1px solid rgba(59,130,246,.3)}
+.badge-purple{background:rgba(139,92,246,.15);color:var(--purple);border:1px solid rgba(139,92,246,.3)}
+.badge-red{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+.logo-mark{width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,var(--gold),var(--amber));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:var(--dark);font-family:'Sora',sans-serif}
+.slide-num{position:absolute;top:18px;right:28px;font-size:11px;color:var(--muted);font-weight:500;letter-spacing:1px}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:14px 0}
+.progress-bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .4s ease;z-index:200;box-shadow:0 0 10px var(--gold)}
+.nav{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:14px;z-index:100;background:rgba(13,21,37,.85);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:60px;padding:9px 20px}
+.nav button{background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;transition:color .2s;display:flex;align-items:center}
+.nav button:hover{color:var(--gold)}
+#slide-counter{font-size:12px;color:var(--muted);min-width:52px;text-align:center;font-weight:600;letter-spacing:.5px}
+.dots{display:flex;gap:5px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--panel2);cursor:pointer;transition:all .25s;border:1px solid var(--border)}
+.dot.active{background:var(--gold);transform:scale(1.3)}
+.kbd-hint{position:fixed;bottom:28px;right:32px;font-size:10px;color:var(--muted);z-index:100;display:flex;gap:6px;align-items:center}
+.kbd{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:2px 6px;font-size:10px}
+
+/* ── ARCH NODE STYLES ── */
+.layer{border-radius:14px;padding:14px 18px;position:relative}
+.layer-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;opacity:.7}
+.node{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;text-align:center;font-size:11px;font-weight:600;line-height:1.4}
+.node-icon{font-size:18px;display:block;margin-bottom:4px}
+.node.hl-gold{border-color:var(--gold);background:rgba(245,166,35,.08)}
+.node.hl-blue{border-color:var(--blue);background:rgba(59,130,246,.08)}
+.node.hl-green{border-color:var(--green);background:rgba(16,185,129,.08)}
+.node.hl-purple{border-color:var(--purple);background:rgba(139,92,246,.08)}
+.arrow-right{color:var(--gold);font-size:16px;padding:0 4px;flex-shrink:0}
+.arrow-down{color:var(--gold);font-size:14px;text-align:center;margin:4px 0}
+
+/* ── DATA FLOW STEPS ── */
+.step{display:flex;gap:14px;align-items:flex-start;margin-bottom:10px}
+.step-num{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--amber));color:var(--dark);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-body{flex:1}
+.step-title{font-size:12px;font-weight:700;margin-bottom:2px;color:var(--text)}
+.step-desc{font-size:11px;color:var(--muted);line-height:1.5}
+
+/* ── SWIMLANE ── */
+.swimlane{display:flex;gap:0;height:100%}
+.lane{flex:1;border-right:1px solid var(--border);padding:0 12px}
+.lane:last-child{border-right:none}
+.lane-head{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.lane-node{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:10px;font-weight:600;margin-bottom:8px;text-align:center;line-height:1.4}
+.lane-arrow{text-align:center;color:var(--gold);font-size:13px;margin:2px 0}
+
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.float{animation:float 4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.pulse{animation:pulse 2s ease-in-out infinite}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="pbar"></div>
+<div class="deck" id="deck">
+
+<!-- ═══ SLIDE 1 — COVER ═══ -->
+<div class="slide active" id="s1">
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-gold" style="width:500px;height:500px;top:-80px;left:-60px;opacity:.6"></div>
+  <div class="bg-glow glow-blue" style="width:400px;height:400px;bottom:-80px;right:10%;opacity:.5"></div>
+
+  <div class="slide-inner" style="justify-content:center">
+    <div style="max-width:660px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:30px">
+        <div class="logo-mark">E</div>
+        <span style="font-size:12px;color:var(--muted);letter-spacing:2px;font-weight:600">ETIP · 2026</span>
+      </div>
+      <div class="tag" style="margin-bottom:20px">🏗️ System Architecture · V1</div>
+      <h1 style="margin-bottom:20px">
+        How ETIP Works<br>
+        <span class="gradient-text">Under the Hood.</span>
+      </h1>
+      <p style="font-size:16px;color:var(--muted);line-height:1.75;max-width:520px;margin-bottom:38px">
+        A visual walkthrough of the platform's technical architecture, component interactions, and end-to-end data flows for the Electricity Token Intermediary Platform.
+      </p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <span class="badge badge-gold">⚡ MVP v1.0</span>
+        <span class="badge badge-blue">Django 5.1 · DRF</span>
+        <span class="badge badge-green">PostgreSQL · Redis</span>
+        <span class="badge badge-purple">Celery · Docker</span>
+      </div>
+    </div>
+
+    <div class="float" style="position:absolute;right:8%;top:50%;transform:translateY(-50%);font-size:200px;opacity:.04;line-height:1;user-select:none">⚡</div>
+    <div style="position:absolute;right:8%;top:50%;transform:translateY(-50%);width:320px;height:320px;border-radius:50%;border:1px solid rgba(245,166,35,.1);display:flex;align-items:center;justify-content:center">
+      <div style="width:240px;height:240px;border-radius:50%;border:1px solid rgba(245,166,35,.07);display:flex;align-items:center;justify-content:center">
+        <span style="font-size:70px" class="float">⚡</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:16px 64px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);position:relative;z-index:1">
+    <span style="font-size:11px;color:var(--muted)">Confidential · February 2026</span>
+    <div style="display:flex;gap:8px">
+      <span class="badge badge-gold">6 Slides</span>
+      <span class="badge badge-green">Infrastructure Ready ✓</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 2 — HIGH-LEVEL ARCHITECTURE ═══ -->
+<div class="slide" id="s2">
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-gold" style="width:400px;height:300px;top:-60px;right:-60px;opacity:.4"></div>
+
+  <div class="slide-inner">
+    <div class="slide-num">02 / 06</div>
+    <div class="tag" style="margin-bottom:14px">🏛️ High-Level Architecture</div>
+    <h2 style="margin-bottom:4px">3-Layer Platform Design</h2>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:18px">Presentation → Application → Data & External Services</p>
+
+    <!-- PRESENTATION LAYER -->
+    <div class="layer" style="background:rgba(245,166,35,.05);border:1px solid rgba(245,166,35,.2);margin-bottom:8px">
+      <div class="layer-label" style="color:var(--gold)">📱 Presentation Layer — Client Apps</div>
+      <div style="display:flex;gap:10px">
+        <div class="node hl-gold" style="flex:1">
+          <span class="node-icon">📱</span>
+          Mobile App<br><span style="font-size:9px;color:var(--muted)">React Native<br>iOS + Android</span>
+        </div>
+        <div class="node hl-gold" style="flex:1">
+          <span class="node-icon">🖥️</span>
+          Admin Dashboard<br><span style="font-size:9px;color:var(--muted)">React.js<br>Web Browser</span>
+        </div>
+        <div class="node" style="flex:1;border-style:dashed;opacity:.5">
+          <span class="node-icon">🌐</span>
+          Web App (v2)<br><span style="font-size:9px;color:var(--muted)">Future Phase</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">↓ REST API (HTTPS / JWT) ↓</div>
+
+    <!-- APPLICATION LAYER -->
+    <div class="layer" style="background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.2);margin-bottom:8px">
+      <div class="layer-label" style="color:var(--blue)">⚙️ Application Layer — Backend Services</div>
+      <div style="display:flex;gap:10px">
+        <div class="node hl-blue" style="flex:1">
+          <span class="node-icon">🔐</span>
+          Auth Service<br><span style="font-size:9px;color:var(--muted)">JWT · OTP · RBAC</span>
+        </div>
+        <div class="node hl-blue" style="flex:1">
+          <span class="node-icon">⚡</span>
+          Meter Service<br><span style="font-size:9px;color:var(--muted)">Validate · Cache</span>
+        </div>
+        <div class="node hl-blue" style="flex:1">
+          <span class="node-icon">💳</span>
+          Payment Service<br><span style="font-size:9px;color:var(--muted)">Paystack · Flutter</span>
+        </div>
+        <div class="node hl-blue" style="flex:1">
+          <span class="node-icon">🎟️</span>
+          Token Service<br><span style="font-size:9px;color:var(--muted)">DISCO API · Retry</span>
+        </div>
+        <div class="node hl-blue" style="flex:1">
+          <span class="node-icon">🛡️</span>
+          Admin Service<br><span style="font-size:9px;color:var(--muted)">Audit · Reports</span>
+        </div>
+      </div>
+      <div style="margin-top:8px;border-top:1px solid rgba(59,130,246,.15);padding-top:8px;display:flex;gap:10px">
+        <div class="node" style="flex:1;text-align:center;font-size:10px">
+          🔄 <strong>Celery Workers</strong> — Async token retry · Notification dispatch · Scheduled reports
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">↓ Queries / Pub-Sub / HTTP ↓</div>
+
+    <!-- DATA LAYER -->
+    <div class="layer" style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2)">
+      <div class="layer-label" style="color:var(--green)">🗄️ Data & External Services Layer</div>
+      <div style="display:flex;gap:10px">
+        <div class="node hl-green" style="flex:1.3">
+          <span class="node-icon">🐘</span>
+          PostgreSQL<br><span style="font-size:9px;color:var(--muted)">Primary DB<br>+ Read Replica</span>
+        </div>
+        <div class="node hl-green" style="flex:1.3">
+          <span class="node-icon">⚡</span>
+          Redis<br><span style="font-size:9px;color:var(--muted)">Cache + Queue<br>+ Sessions</span>
+        </div>
+        <div class="node" style="flex:1">
+          <span class="node-icon">🏢</span>
+          DISCO APIs<br><span style="font-size:9px;color:var(--muted)">IBEDC·EKEDC<br>AEDC</span>
+        </div>
+        <div class="node" style="flex:1">
+          <span class="node-icon">💰</span>
+          Gateways<br><span style="font-size:9px;color:var(--muted)">Paystack<br>Flutterwave</span>
+        </div>
+        <div class="node" style="flex:1">
+          <span class="node-icon">📨</span>
+          Notify<br><span style="font-size:9px;color:var(--muted)">FCM Push<br>SMS</span>
+        </div>
+        <div class="node" style="flex:1">
+          <span class="node-icon">🪣</span>
+          Storage<br><span style="font-size:9px;color:var(--muted)">AWS S3<br>Receipts</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 3 — TOKEN PURCHASE FLOW ═══ -->
+<div class="slide" id="s3">
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-green" style="width:400px;height:300px;bottom:-60px;left:-40px;opacity:.5"></div>
+
+  <div class="slide-inner">
+    <div class="slide-num">03 / 06</div>
+    <div class="tag" style="margin-bottom:14px">🔄 Data Flow · Token Purchase</div>
+    <h2 style="margin-bottom:4px">Token in <span class="accent">Under 10 Seconds</span></h2>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px">End-to-end journey from user tap to token on screen — happy path</p>
+
+    <div style="display:flex;gap:16px;flex:1">
+      <!-- Steps -->
+      <div style="flex:1">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">User selects DISCO + Meter</div>
+            <div class="step-desc">Mobile app sends meter number to <code style="font-size:10px;color:var(--gold)">POST /api/v1/meters/validate/</code></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Meter Validation</div>
+            <div class="step-desc">Backend calls DISCO API. Result cached in Redis (30 min). Meter owner name returned to user for confirmation.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">User enters amount & pays</div>
+            <div class="step-desc">App calls <code style="font-size:10px;color:var(--gold)">POST /api/v1/payments/initiate/</code>. Transaction record created with status <span class="badge badge-gold" style="font-size:9px">PENDING</span></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Payment Gateway Callback</div>
+            <div class="step-desc">Paystack/Flutterwave fires webhook to <code style="font-size:10px;color:var(--gold)">/api/v1/webhooks/</code>. Signature verified. Transaction → <span class="badge badge-blue" style="font-size:9px">PAID</span></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <div class="step-title">Celery dispatches Token Task</div>
+            <div class="step-desc">Async worker calls DISCO token API with meter + amount. Retries up to 3× with backoff (2s → 4s → 8s).</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">6</div>
+          <div class="step-body">
+            <div class="step-title">Token delivered ✓</div>
+            <div class="step-desc">Token encrypted (Fernet AES-256) and stored. Transaction → <span class="badge badge-green" style="font-size:9px">COMPLETED</span>. FCM push + SMS sent simultaneously.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual flow diagram -->
+      <div style="width:260px;display:flex;flex-direction:column;gap:6px">
+        <div class="card" style="text-align:center;padding:12px;border-color:var(--gold)">
+          <div style="font-size:22px">📱</div>
+          <div style="font-size:11px;font-weight:700;margin-top:4px">Mobile App</div>
+          <div style="font-size:9px;color:var(--muted)">React Native</div>
+        </div>
+        <div class="arrow-down">↓ HTTPS</div>
+        <div class="card" style="text-align:center;padding:12px;border-color:var(--blue)">
+          <div style="font-size:22px">⚙️</div>
+          <div style="font-size:11px;font-weight:700;margin-top:4px">Django API</div>
+          <div style="font-size:9px;color:var(--muted)">Meter · Payment · Token</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <div style="flex:1;text-align:center">
+            <div class="arrow-down">↓</div>
+            <div class="card" style="text-align:center;padding:10px;border-color:var(--green)">
+              <div style="font-size:18px">🏢</div>
+              <div style="font-size:10px;font-weight:700">DISCO API</div>
+            </div>
+          </div>
+          <div style="flex:1;text-align:center">
+            <div class="arrow-down">↓</div>
+            <div class="card" style="text-align:center;padding:10px">
+              <div style="font-size:18px">💳</div>
+              <div style="font-size:10px;font-weight:700">Gateway</div>
+            </div>
+          </div>
+        </div>
+        <div class="arrow-down">↓ Webhook</div>
+        <div class="card" style="text-align:center;padding:12px;border-color:var(--purple)">
+          <div style="font-size:22px">🔄</div>
+          <div style="font-size:11px;font-weight:700;margin-top:4px">Celery Worker</div>
+          <div style="font-size:9px;color:var(--muted)">Async Token Dispatch</div>
+        </div>
+        <div class="arrow-down">↓ FCM + SMS</div>
+        <div class="card" style="text-align:center;padding:12px;border-color:var(--green)">
+          <div style="font-size:22px">🎟️</div>
+          <div style="font-size:11px;font-weight:700;margin-top:4px;color:var(--green)">Token Delivered ✓</div>
+          <div style="font-size:9px;color:var(--muted)">≤ 10 seconds</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:10px;display:flex;gap:20px;padding:12px 20px;align-items:center">
+      <span style="font-size:20px">⚠️</span>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--gold)">Failure Path</div>
+        <div style="font-size:11px;color:var(--muted)">If all DISCO retries fail → Transaction marked <span class="badge badge-red" style="font-size:9px">FAILED</span> → Admin alerted → Manual resolution tool available in admin panel → Customer notified via SMS</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 4 — COMPONENT MAP ═══ -->
+<div class="slide" id="s4">
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-blue" style="width:500px;height:400px;top:-80px;right:-60px;opacity:.4"></div>
+
+  <div class="slide-inner">
+    <div class="slide-num">04 / 06</div>
+    <div class="tag" style="margin-bottom:14px">🧩 Component Map</div>
+    <h2 style="margin-bottom:16px">Backend <span class="accent">Service Breakdown</span></h2>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;flex:1;align-content:start">
+
+      <div class="card" style="border-color:rgba(245,166,35,.4)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:34px;height:34px;border-radius:8px;background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.3);display:flex;align-items:center;justify-content:center;font-size:16px">🔐</div>
+          <div>
+            <div style="font-size:13px;font-weight:700">accounts</div>
+            <div style="font-size:10px;color:var(--muted)">Auth & Users</div>
+          </div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.7">
+          ▸ Custom User model (phone-first)<br>
+          ▸ JWT access + refresh tokens<br>
+          ▸ OTP registration & password reset<br>
+          ▸ TOTP 2FA for admin users<br>
+          ▸ RBAC: Consumer · Staff · SuperAdmin
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(59,130,246,.4)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:34px;height:34px;border-radius:8px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);display:flex;align-items:center;justify-content:center;font-size:16px">⚡</div>
+          <div>
+            <div style="font-size:13px;font-weight:700">meters</div>
+            <div style="font-size:10px;color:var(--muted)">Meter Profiles</div>
+          </div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.7">
+          ▸ Meter number validation via DISCO API<br>
+          ▸ Redis cache (30-min TTL)<br>
+          ▸ Up to 5 saved meter profiles/user<br>
+          ▸ 3-retry + exponential backoff<br>
+          ▸ DISCO provider selection (IBEDC, EKEDC, AEDC)
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(16,185,129,.4)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:34px;height:34px;border-radius:8px;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);display:flex;align-items:center;justify-content:center;font-size:16px">💳</div>
+          <div>
+            <div style="font-size:13px;font-weight:700">payments</div>
+            <div style="font-size:10px;color:var(--muted)">Payment Processing</div>
+          </div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.7">
+          ▸ Paystack & Flutterwave integration<br>
+          ▸ Webhook signature verification<br>
+          ▸ Payment session expiry (10 min)<br>
+          ▸ Idempotent webhook processing<br>
+          ▸ Min ₦500 / Max ₦100,000 per purchase
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(139,92,246,.4)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:34px;height:34px;border-radius:8px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center;font-size:16px">🎟️</div>
+          <div>
+            <div style="font-size:13px;font-weight:700">transactions</div>
+            <div style="font-size:10px;color:var(--muted)">Token Lifecycle</div>
+          </div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.7">
+          ▸ Full transaction state machine<br>
+          ▸ PENDING → PAID → COMPLETED / FAILED<br>
+          ▸ Token encrypted at rest (Fernet)<br>
+          ▸ PDF receipt generation (xhtml2pdf)<br>
+          ▸ Transaction history & search
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(245,166,35,.4)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:34px;height:34px;border-radius:8px;background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.3);display:flex;align-items:center;justify-content:center;font-size:16px">📨</div>
+          <div>
+            <div style="font-size:13px;font-weight:700">notifications</div>
+            <div style="font-size:10px;color:var(--muted)">Multi-Channel Alerts</div>
+          </div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.7">
+          ▸ FCM push notifications (Firebase)<br>
+          ▸ SMS via gateway (SMS Sender ID: ETIP)<br>
+          ▸ In-app notification store<br>
+          ▸ Celery task dispatch (async)<br>
+          ▸ Token delivery & failure alerts
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(239,68,68,.4)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:34px;height:34px;border-radius:8px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);display:flex;align-items:center;justify-content:center;font-size:16px">🛡️</div>
+          <div>
+            <div style="font-size:13px;font-weight:700">admin_panel</div>
+            <div style="font-size:10px;color:var(--muted)">Operations</div>
+          </div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.7">
+          ▸ Immutable audit log (all actions)<br>
+          ▸ User management & role assignment<br>
+          ▸ Transaction monitoring & resolution<br>
+          ▸ Manual token resend<br>
+          ▸ Revenue reconciliation reports
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-top:12px;display:flex;gap:14px;align-items:center;padding:12px 18px">
+      <span style="font-size:18px">🔧</span>
+      <div style="font-size:11px;color:var(--muted)">
+        <strong style="color:var(--text)">Shared infrastructure:</strong> &nbsp;
+        Celery Beat (scheduled tasks) · Flower (Celery monitoring) · drf-spectacular (OpenAPI docs) · django-ratelimit (rate limiting) · django-environ (config)
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 5 — INFRASTRUCTURE & SECURITY ═══ -->
+<div class="slide" id="s5">
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-purple" style="width:450px;height:350px;top:-60px;left:-40px;opacity:.5"></div>
+
+  <div class="slide-inner">
+    <div class="slide-num">05 / 06</div>
+    <div class="tag" style="margin-bottom:14px">🏗️ Infrastructure & Security</div>
+    <h2 style="margin-bottom:16px">Built to <span class="accent">Scale & Stay Safe</span></h2>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;flex:1;align-content:start">
+
+      <!-- Local Dev Stack -->
+      <div class="card">
+        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+          <span>🐳</span> Local Dev Stack (Docker Compose)
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--panel2);border-radius:7px;font-size:11px">
+            <span>🐘 etip_postgres</span><span class="badge badge-green" style="font-size:9px">postgres:16-alpine</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--panel2);border-radius:7px;font-size:11px">
+            <span>⚡ etip_redis</span><span class="badge badge-green" style="font-size:9px">redis:7-alpine</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--panel2);border-radius:7px;font-size:11px">
+            <span>🌐 etip_api</span><span class="badge badge-blue" style="font-size:9px">:8000</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--panel2);border-radius:7px;font-size:11px">
+            <span>🔄 etip_celery_worker</span><span class="badge badge-purple" style="font-size:9px">concurrency=4</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--panel2);border-radius:7px;font-size:11px">
+            <span>📅 etip_celery_beat</span><span class="badge badge-purple" style="font-size:9px">DB Scheduler</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--panel2);border-radius:7px;font-size:11px">
+            <span>🌸 etip_flower</span><span class="badge badge-gold" style="font-size:9px">:5555</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Production Target -->
+      <div class="card">
+        <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+          <span>☁️</span> Production Target (Cloud)
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--panel2);border-radius:7px;font-size:11px">
+            <span>API Containers</span><span class="badge badge-blue" style="font-size:9px">AWS ECS / Cloud Run</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--panel2);border-radius:7px;font-size:11px">
+            <span>Database</span><span class="badge badge-blue" style="font-size:9px">RDS PostgreSQL</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--panel2);border-radius:7px;font-size:11px">
+            <span>Cache / Queue</span><span class="badge badge-blue" style="font-size:9px">ElastiCache Redis</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--panel2);border-radius:7px;font-size:11px">
+            <span>File Storage</span><span class="badge badge-blue" style="font-size:9px">AWS S3</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--panel2);border-radius:7px;font-size:11px">
+            <span>Monitoring</span><span class="badge badge-blue" style="font-size:9px">Sentry + Datadog</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--panel2);border-radius:7px;font-size:11px">
+            <span>Uptime SLA</span><span class="badge badge-green" style="font-size:9px">≥ 99.5%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Security -->
+      <div class="card">
+        <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+          <span>🔒</span> Security Controls
+        </div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.9">
+          ✅ &nbsp;JWT access (15 min) + refresh rotation (30 days)<br>
+          ✅ &nbsp;AES-256 (Fernet) encryption for tokens at rest<br>
+          ✅ &nbsp;TLS 1.2+ on all endpoints (HTTPS only)<br>
+          ✅ &nbsp;Rate limiting per-IP and per-user<br>
+          ✅ &nbsp;Bcrypt password hashing (cost ≥ 12)<br>
+          ✅ &nbsp;Webhook HMAC signature verification<br>
+          ✅ &nbsp;Account lockout after 5 failed attempts<br>
+          ✅ &nbsp;Immutable admin audit log
+        </div>
+      </div>
+
+      <!-- API Design -->
+      <div class="card">
+        <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+          <span>📡</span> API Design Principles
+        </div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.9">
+          ✅ &nbsp;RESTful JSON — versioned at <code style="color:var(--gold)">/api/v1/</code><br>
+          ✅ &nbsp;OpenAPI 3.0 (drf-spectacular) at <code style="color:var(--gold)">/api/docs/</code><br>
+          ✅ &nbsp;Stateless — no server-side sessions<br>
+          ✅ &nbsp;Consistent envelope: status · data · message<br>
+          ✅ &nbsp;Pagination (page size 20) on all lists<br>
+          ✅ &nbsp;Structured JSON logs with correlation IDs<br>
+          ✅ &nbsp;≤ 500ms p95 API response target<br>
+          ✅ &nbsp;Idempotent webhook handlers
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 6 — V1 COMPLETE ARCHITECTURE SUMMARY ═══ -->
+<div class="slide" id="s6">
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-green" style="width:400px;height:400px;bottom:-80px;right:-60px;opacity:.4"></div>
+  <div class="bg-glow glow-gold" style="width:300px;height:300px;top:-60px;left:-40px;opacity:.3"></div>
+
+  <div class="slide-inner">
+    <div class="slide-num">06 / 06</div>
+    <div class="tag" style="margin-bottom:14px">✅ V1 Complete Architecture</div>
+    <h2 style="margin-bottom:4px">Everything Delivered in <span class="accent">Version 1</span></h2>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px">The full stack — infrastructure, backend, integrations, and operations — production-ready.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">
+
+      <div class="card" style="border-color:var(--gold)">
+        <div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:6px">🔐 Auth & Users</div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.8">
+          ✅ Phone-first registration<br>
+          ✅ OTP verification (6-digit, 5 min)<br>
+          ✅ JWT access + refresh rotation<br>
+          ✅ Password reset via OTP<br>
+          ✅ TOTP 2FA for admins<br>
+          ✅ RBAC: Consumer · Staff · SuperAdmin<br>
+          ✅ Account lockout (5 attempts)
+        </div>
+      </div>
+
+      <div class="card" style="border-color:var(--blue)">
+        <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:6px">⚡ Meters & Tokens</div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.8">
+          ✅ DISCO API meter validation<br>
+          ✅ Redis cache (30-min TTL)<br>
+          ✅ 3 DISCOs: IBEDC · EKEDC · AEDC<br>
+          ✅ 5 saved meter profiles/user<br>
+          ✅ Async token dispatch (Celery)<br>
+          ✅ 3× retry + exponential backoff<br>
+          ✅ Fernet AES-256 token encryption
+        </div>
+      </div>
+
+      <div class="card" style="border-color:var(--green)">
+        <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:10px;display:flex;align-items:center;gap:6px">💳 Payments</div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.8">
+          ✅ Paystack integration<br>
+          ✅ Flutterwave integration<br>
+          ✅ HMAC webhook verification<br>
+          ✅ Idempotent webhook handling<br>
+          ✅ Payment session expiry (10 min)<br>
+          ✅ ₦500 min · ₦100,000 max<br>
+          ✅ Full transaction state machine
+        </div>
+      </div>
+
+      <div class="card" style="border-color:var(--purple)">
+        <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:10px;display:flex;align-items:center;gap:6px">🛡️ Admin & Ops</div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.8">
+          ✅ Admin dashboard (RBAC)<br>
+          ✅ Immutable audit log<br>
+          ✅ Transaction monitoring<br>
+          ✅ Manual token resend<br>
+          ✅ User management<br>
+          ✅ Revenue reconciliation<br>
+          ✅ Celery Beat scheduler
+        </div>
+      </div>
+
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+
+      <div class="card" style="border-color:rgba(16,185,129,.3);padding:14px 18px">
+        <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:10px;display:flex;align-items:center;gap:6px">🐳 Infrastructure</div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.8">
+          ✅ Docker Compose (6 containers)<br>
+          ✅ PostgreSQL 16 · Redis 7<br>
+          ✅ Celery Worker (concurrency=4)<br>
+          ✅ Celery Beat (DB scheduler)<br>
+          ✅ Flower monitoring (:5555)<br>
+          ✅ Health checks on all services
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(245,166,35,.3);padding:14px 18px">
+        <div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:6px">📨 Notifications & Delivery</div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.8">
+          ✅ FCM push (Firebase Admin)<br>
+          ✅ SMS gateway (Sender: ETIP)<br>
+          ✅ In-app notification store<br>
+          ✅ PDF receipt (xhtml2pdf)<br>
+          ✅ AWS S3 receipt storage<br>
+          ✅ Token delivered ≤ 10 seconds
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(59,130,246,.3);padding:14px 18px">
+        <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:6px">📡 API & Quality</div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.8">
+          ✅ REST JSON · versioned /api/v1/<br>
+          ✅ OpenAPI 3.0 docs (/api/docs/)<br>
+          ✅ Rate limiting per-IP & per-user<br>
+          ✅ TLS 1.2+ · HTTPS only<br>
+          ✅ pytest · factory-boy test suite<br>
+          ✅ ≥ 80% backend code coverage
+        </div>
+      </div>
+
+    </div>
+
+    <div style="padding:12px 0 0;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:11px;color:var(--muted)">ETIP System Architecture v1 · February 2026 · Confidential</span>
+      <div style="display:flex;gap:8px">
+        <span class="badge badge-green">✅ V1 Delivered</span>
+        <span class="badge badge-gold">Presentation Ready</span>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+<!-- Navigation -->
+<nav class="nav">
+  <button onclick="go(-1)" title="Previous">&#8592;</button>
+  <div class="dots" id="dots"></div>
+  <span id="slide-counter">1 / 6</span>
+  <button onclick="go(1)" title="Next">&#8594;</button>
+</nav>
+
+<div class="kbd-hint">
+  <span class="kbd">←</span><span class="kbd">→</span> navigate
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+let cur = 0;
+
+const dotsEl = document.getElementById('dots');
+slides.forEach((_,i)=>{
+  const d = document.createElement('div');
+  d.className = 'dot' + (i===0?' active':'');
+  d.onclick = ()=>goTo(i);
+  dotsEl.appendChild(d);
+});
+
+function goTo(n){
+  slides[cur].classList.remove('active');
+  slides[cur].classList.add('exit');
+  setTimeout(()=>slides[cur].classList.remove('exit'), 600);
+  cur = ((n % total) + total) % total;
+  slides[cur].classList.add('active');
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===cur));
+  document.getElementById('slide-counter').textContent = (cur+1)+' / '+total;
+  document.getElementById('pbar').style.width = ((cur+1)/total*100)+'%';
+}
+
+function go(dir){ goTo(cur+dir); }
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown') go(1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp') go(-1);
+});
+
+document.getElementById('pbar').style.width = (1/total*100)+'%';
+</script>
+</body>
+</html>

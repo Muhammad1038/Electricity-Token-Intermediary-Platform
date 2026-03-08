@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ETIP — Pitch Deck 2026</title>
+<style>
+  /* ── RESET & FONT ─────────────────────────────────────────────── */
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Sora:wght@300;400;600;700;800&display=swap');
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold:    #F5A623;
+    --gold2:   #FFD166;
+    --amber:   #E08C00;
+    --dark:    #070B14;
+    --dark2:   #0D1525;
+    --dark3:   #111827;
+    --panel:   #141C2E;
+    --panel2:  #1A2540;
+    --border:  rgba(245,166,35,0.18);
+    --blue:    #3B82F6;
+    --green:   #10B981;
+    --red:     #EF4444;
+    --text:    #F0F4FF;
+    --muted:   #8B98B8;
+    --white:   #FFFFFF;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--dark);
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  /* ── SLIDE ENGINE ─────────────────────────────────────────────── */
+  .deck { width: 100vw; height: 100vh; position: relative; }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    opacity: 0; pointer-events: none;
+    transition: opacity .55s cubic-bezier(.4,0,.2,1),
+                transform .55s cubic-bezier(.4,0,.2,1);
+    transform: translateX(60px);
+    overflow: hidden;
+  }
+  .slide.active {
+    opacity: 1; pointer-events: all; transform: translateX(0);
+  }
+  .slide.exit {
+    opacity: 0; transform: translateX(-60px);
+  }
+
+  /* ── GLOBAL LAYOUT HELPERS ────────────────────────────────────── */
+  .slide-inner {
+    flex: 1; display: flex; flex-direction: column;
+    padding: 52px 72px 40px;
+    position: relative; overflow: hidden;
+  }
+
+  .tag {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(245,166,35,.12);
+    border: 1px solid var(--border);
+    color: var(--gold);
+    padding: 5px 14px; border-radius: 50px;
+    font-size: 11px; font-weight: 600; letter-spacing: 1.4px;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(38px, 5.5vw, 74px);
+    font-weight: 800; line-height: 1.05;
+    letter-spacing: -1.5px;
+  }
+  h2 {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(26px, 3vw, 44px);
+    font-weight: 700; line-height: 1.1;
+    letter-spacing: -.8px;
+  }
+  h3 { font-size: 18px; font-weight: 700; }
+
+  .accent { color: var(--gold); }
+  .accent2 { color: var(--gold2); }
+  .muted { color: var(--muted); }
+
+  .gradient-text {
+    background: linear-gradient(130deg, #F5A623 0%, #FFD166 50%, #FF8C00 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── BACKGROUNDS ──────────────────────────────────────────────── */
+  .bg-grid {
+    position: absolute; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(245,166,35,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245,166,35,.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  .bg-glow {
+    position: absolute; border-radius: 50%;
+    filter: blur(110px); z-index: 0; pointer-events: none;
+  }
+  .glow-gold  { background: rgba(245,166,35,.18); }
+  .glow-blue  { background: rgba(59,130,246,.14); }
+  .glow-green { background: rgba(16,185,129,.12); }
+
+  .slide-inner > * { position: relative; z-index: 1; }
+
+  /* ── NAV ──────────────────────────────────────────────────────── */
+  .nav {
+    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 16px; z-index: 100;
+    background: rgba(13,21,37,.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 60px; padding: 10px 22px;
+  }
+  .nav button {
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); font-size: 20px; transition: color .2s;
+    display: flex; align-items: center;
+  }
+  .nav button:hover { color: var(--gold); }
+  #slide-counter {
+    font-size: 12px; color: var(--muted); min-width: 54px; text-align: center;
+    font-weight: 600; letter-spacing: .5px;
+  }
+  .dots { display: flex; gap: 6px; }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--panel2); cursor: pointer;
+    transition: all .25s; border: 1px solid var(--border);
+  }
+  .dot.active { background: var(--gold); transform: scale(1.3); }
+
+  /* ── SLIDE PROGRESS BAR ───────────────────────────────────────── */
+  .progress-bar {
+    position: fixed; top: 0; left: 0; height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2));
+    transition: width .4s ease; z-index: 200;
+    box-shadow: 0 0 10px var(--gold);
+  }
+
+  /* ── SLIDE NUMBERS ────────────────────────────────────────────── */
+  .slide-num {
+    position: absolute; top: 22px; right: 32px;
+    font-size: 11px; color: var(--muted); font-weight: 500;
+    letter-spacing: 1px;
+  }
+
+  /* ── CARDS ────────────────────────────────────────────────────── */
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px 26px;
+  }
+  .card-sm { padding: 16px 20px; border-radius: 12px; }
+
+  /* ── STAT BOXES ───────────────────────────────────────────────── */
+  .stat-val {
+    font-family: 'Sora', sans-serif;
+    font-size: 38px; font-weight: 800;
+    color: var(--gold); line-height: 1;
+  }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 500; letter-spacing: .4px; }
+
+  /* ── GRID UTILS ───────────────────────────────────────────────── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+  /* ── BADGE ────────────────────────────────────────────────────── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 50px; font-size: 11px; font-weight: 600;
+  }
+  .badge-green { background: rgba(16,185,129,.15); color: var(--green); border: 1px solid rgba(16,185,129,.3); }
+  .badge-gold  { background: rgba(245,166,35,.15);  color: var(--gold);  border: 1px solid rgba(245,166,35,.3); }
+  .badge-blue  { background: rgba(59,130,246,.15);  color: var(--blue);  border: 1px solid rgba(59,130,246,.3); }
+  .badge-red   { background: rgba(239,68,68,.12);   color: var(--red);   border: 1px solid rgba(239,68,68,.25); }
+
+  /* ── ICON CIRCLE ──────────────────────────────────────────────── */
+  .icon-c {
+    width: 46px; height: 46px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .ic-gold  { background: rgba(245,166,35,.15); border: 1px solid rgba(245,166,35,.3); }
+  .ic-blue  { background: rgba(59,130,246,.15); border: 1px solid rgba(59,130,246,.3); }
+  .ic-green { background: rgba(16,185,129,.15); border: 1px solid rgba(16,185,129,.3); }
+  .ic-red   { background: rgba(239,68,68,.12);  border: 1px solid rgba(239,68,68,.3); }
+
+  /* ── PROGRESS BAR (in-slide) ──────────────────────────────────── */
+  .bar-track {
+    height: 8px; background: var(--panel2); border-radius: 50px; overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .bar-fill {
+    height: 100%; border-radius: 50px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2));
+    box-shadow: 0 0 8px rgba(245,166,35,.5);
+    transition: width 1s ease;
+  }
+
+  /* ── TIMELINE ─────────────────────────────────────────────────── */
+  .timeline { display: flex; flex-direction: column; gap: 0; }
+  .tl-item  { display: flex; gap: 18px; }
+  .tl-line-wrap { display: flex; flex-direction: column; align-items: center; }
+  .tl-dot   { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+  .tl-rod   { width: 2px; flex: 1; margin: 4px 0; }
+  .tl-done  { background: var(--green); box-shadow: 0 0 8px var(--green); }
+  .tl-wip   { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+  .tl-next  { background: var(--panel2); border: 1px solid var(--border); }
+  .tl-rod-done { background: linear-gradient(180deg, var(--green), var(--gold)); }
+  .tl-rod-next { background: var(--border); }
+
+  /* ── FLOW DIAGRAM ─────────────────────────────────────────────── */
+  .flow { display: flex; align-items: center; gap: 0; flex-wrap: nowrap; }
+  .flow-node {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 16px;
+    text-align: center; font-size: 11px; font-weight: 600;
+    min-width: 90px; line-height: 1.4;
+    color: var(--text);
+  }
+  .flow-node .fn-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+  .flow-arrow { color: var(--gold); font-size: 20px; padding: 0 6px; flex-shrink: 0; }
+  .flow-node.hl { border-color: var(--gold); background: rgba(245,166,35,.08); }
+
+  /* ── PIE CHART (CSS) ──────────────────────────────────────────── */
+  .pie-wrap { position: relative; width: 180px; height: 180px; flex-shrink: 0; }
+  .pie {
+    width: 180px; height: 180px; border-radius: 50%;
+    background: conic-gradient(
+      var(--green)  0%  45%,
+      var(--gold)   45% 65%,
+      var(--blue)   65% 80%,
+      #8B5CF6       80% 100%
+    );
+    position: relative;
+  }
+  .pie::after {
+    content: ''; position: absolute;
+    width: 90px; height: 90px; background: var(--dark2);
+    border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  }
+  .pie-label {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2; text-align: center;
+    font-size: 12px; font-weight: 700; color: var(--gold);
+  }
+
+  /* ── KEYBOARD HINT ────────────────────────────────────────────── */
+  .kbd-hint {
+    position: fixed; bottom: 32px; right: 36px;
+    font-size: 10px; color: var(--muted); z-index: 100;
+    display: flex; gap: 8px; align-items: center;
+  }
+  .kbd {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 4px; padding: 2px 7px; font-size: 10px;
+  }
+
+  /* ── DIVIDER ──────────────────────────────────────────────────── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 18px 0;
+  }
+
+  /* ── QUOTE ────────────────────────────────────────────────────── */
+  .quote-box {
+    border-left: 3px solid var(--gold);
+    padding: 14px 20px;
+    background: rgba(245,166,35,.05);
+    border-radius: 0 12px 12px 0;
+    font-style: italic; color: var(--text);
+    font-size: 15px; line-height: 1.7;
+  }
+
+  /* ── ANIMATIONS ───────────────────────────────────────────────── */
+  @keyframes pulse-ring {
+    0%   { transform: scale(1);   opacity: .7; }
+    70%  { transform: scale(1.4); opacity: 0;  }
+    100% { transform: scale(1.4); opacity: 0;  }
+  }
+  .pulse-ring::before {
+    content: ''; position: absolute; inset: -4px;
+    border-radius: 50%; border: 2px solid var(--green);
+    animation: pulse-ring 2s infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-8px); }
+  }
+  .float { animation: float 4s ease-in-out infinite; }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { animation: fade-up .6s ease forwards; }
+
+  /* ── LOGO MARK ────────────────────────────────────────────────── */
+  .logo-mark {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--gold), var(--amber));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 900; color: var(--dark);
+    font-family: 'Sora', sans-serif;
+  }
+
+  /* ── SLIDE-SPECIFIC ───────────────────────────────────────────── */
+
+  /* SLIDE 1 — Title */
+  #s1 { background: var(--dark2); }
+  .hero-bolt {
+    position: absolute; right: 8%; top: 50%; transform: translateY(-50%);
+    font-size: 220px; opacity: .04; pointer-events: none; user-select: none;
+    line-height: 1;
+  }
+  .hero-ring {
+    position: absolute; right: 8%; top: 50%; transform: translateY(-50%);
+    width: 360px; height: 360px; border-radius: 50%;
+    border: 1px solid rgba(245,166,35,.1);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hero-ring::before {
+    content: '';
+    position: absolute; width: 280px; height: 280px;
+    border-radius: 50%; border: 1px solid rgba(245,166,35,.07);
+  }
+
+  /* Table */
+  table { border-collapse: collapse; width: 100%; }
+  th {
+    background: rgba(245,166,35,.1); color: var(--gold);
+    font-size: 11px; font-weight: 700; letter-spacing: .8px;
+    text-transform: uppercase; padding: 10px 14px; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 9px 14px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,.04);
+    color: var(--text); vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+
+  /* Check / X */
+  .chk { color: var(--green); font-size: 14px; }
+  .xmark { color: var(--red); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<!-- Progress bar -->
+<div class="progress-bar" id="pbar"></div>
+
+<div class="deck" id="deck">
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 1 — TITLE / COVER
+═══════════════════════════════════════════════════ -->
+<div class="slide active" id="s1">
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-gold" style="width:500px;height:500px;top:-100px;left:-80px;opacity:.6"></div>
+  <div class="bg-glow glow-blue" style="width:400px;height:400px;bottom:-100px;right:15%;opacity:.5"></div>
+
+  <!-- Hero ring decoration -->
+  <div class="hero-ring float">
+    <span style="font-size:80px">⚡</span>
+  </div>
+
+  <div class="slide-inner" style="justify-content:center">
+    <div style="max-width:640px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:32px">
+        <div class="logo-mark">E</div>
+        <span style="font-size:13px;color:var(--muted);letter-spacing:2px;font-weight:600">ETIP · 2026</span>
+      </div>
+
+      <div class="tag" style="margin-bottom:22px">🇳🇬 Nigeria FinTech × Utility</div>
+
+      <h1 style="margin-bottom:22px">
+        Power Delivered<br>
+        <span class="gradient-text">In Under 10 Seconds.</span>
+      </h1>
+
+      <p style="font-size:18px;color:var(--muted);line-height:1.7;max-width:520px;margin-bottom:40px">
+        ETIP is Nigeria's fastest prepaid electricity token intermediary platform — bridging 1M+ daily transactions between consumers and DISCOs through a single, trusted digital layer.
+      </p>
+
+      <div style="display:flex;gap:32px;align-items:center">
+        <div>
+          <div class="stat-val">₦200M+</div>
+          <div class="stat-label">Target Monthly Volume</div>
+        </div>
+        <div style="width:1px;height:40px;background:var(--border)"></div>
+        <div>
+          <div class="stat-val">99%+</div>
+          <div class="stat-label">Token Delivery Target</div>
+        </div>
+        <div style="width:1px;height:40px;background:var(--border)"></div>
+        <div>
+          <div class="stat-val">10s</div>
+          <div class="stat-label">End-to-End Delivery</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:20px 72px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);position:relative;z-index:1">
+    <span style="font-size:12px;color:var(--muted)">Confidential · February 2026</span>
+    <div style="display:flex;gap:10px">
+      <span class="badge badge-gold">MVP Build</span>
+      <span class="badge badge-green">M1 Complete ✓</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 2 — THE PROBLEM
+═══════════════════════════════════════════════════ -->
+<div class="slide" id="s2">
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-red" style="width:600px;height:400px;top:0;right:-100px;opacity:.08;background:rgba(239,68,68,.2)"></div>
+
+  <div class="slide-inner">
+    <div class="slide-num">02 / 12</div>
+    <div class="tag" style="margin-bottom:20px">⚠️ The Problem</div>
+    <h2 style="margin-bottom:6px">Millions Are Stranded<br>Without <span class="accent">Digital Power Access</span></h2>
+    <p style="color:var(--muted);margin-bottom:30px;font-size:14px">Nigeria has 1M+ prepaid electricity transactions daily. The distribution system is broken.</p>
+
+    <div class="grid-3" style="flex:1;align-items:stretch">
+      <div class="card" style="border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.05)">
+        <div class="icon-c ic-red" style="margin-bottom:14px">🏪</div>
+        <h3 style="margin-bottom:8px;font-size:15px">Physical-Only Vending</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.65">Customers must physically visit kiosks — unavailable at night, weekends, or emergencies. Zero digital alternative for most DISCOs.</p>
+        <div class="divider"></div>
+        <div style="font-size:22px;font-weight:800;color:var(--red)">72%</div>
+        <div style="font-size:11px;color:var(--muted)">of purchases still physical</div>
+      </div>
+
+      <div class="card" style="border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.05)">
+        <div class="icon-c ic-red" style="margin-bottom:14px">❌</div>
+        <h3 style="margin-bottom:8px;font-size:15px">Manual Errors & Failures</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.65">Wrong meter numbers, incorrect amounts, and unverified purchases result in failed tokens with no recourse or tracking.</p>
+        <div class="divider"></div>
+        <div style="font-size:22px;font-weight:800;color:var(--red)">~8%</div>
+        <div style="font-size:11px;color:var(--muted)">estimated manual error rate</div>
+      </div>
+
+      <div class="card" style="border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.05)">
+        <div class="icon-c ic-red" style="margin-bottom:14px">📂</div>
+        <h3 style="margin-bottom:8px;font-size:15px">No History, No Receipts</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.65">Consumers have no digital record of purchases. Disputes are impossible to resolve. DISCOs lack reconciliation data.</p>
+        <div class="divider"></div>
+        <div style="font-size:22px;font-weight:800;color:var(--red)">0</div>
+        <div style="font-size:11px;color:var(--muted)">auditable receipt trail today</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px;display:flex;align-items:center;gap:20px;padding:18px 26px">
+      <div style="font-size:28px">💡</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:3px">The Real Cost</div>
+        <div style="font-size:13px;color:var(--muted)">At ₦2,000 average transaction value × 1M daily transactions = <strong style="color:var(--text)">₦2 billion in daily friction</strong> — delays, errors, lost tokens, unreconciled revenue.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 3 — THE SOLUTION
+═══════════════════════════════════════════════════ -->
+<div class="slide" id="s3">
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-gold" style="width:500px;height:400px;top:-80px;left:-60px;opacity:.5"></div>
+
+  <div class="slide-inner">
+    <div class="slide-num">03 / 12</div>
+    <div class="tag" style="margin-bottom:20px">⚡ The Solution</div>
+    <h2 style="margin-bottom:6px">One Platform. Every DISCO.<br><span class="accent">Token in 10 Seconds.</span></h2>
+    <p style="color:var(--muted);margin-bottom:28px;font-size:14px">ETIP is a regulated digital intermediary that sits between consumers and DISCOs, eliminating friction at every step.</p>
+
+    <!-- Flow diagram -->
+    <div class="card" style="margin-bottom:22px;padding:24px">
+      <div class="flow" style="justify-content:center;flex-wrap:wrap;gap:4px">
+        <div class="flow-node">
+          <span class="fn-icon">👤</span>Consumer<br>App
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node hl">
+          <span class="fn-icon">⚡</span><strong>ETIP</strong><br>Platform
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">
+          <span class="fn-icon">💳</span>Payment<br>Gateway
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">
+          <span class="fn-icon">🏭</span>DISCO<br>API
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node" style="border-color:var(--green)">
+          <span class="fn-icon">🔑</span>Token<br>Delivered
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--muted)">
+        ⚡ Average end-to-end time: <strong style="color:var(--gold)">&lt; 10 seconds</strong> &nbsp;|&nbsp; 
+        🔒 Server-side verified &nbsp;|&nbsp; 
+        📲 Push + SMS delivery
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="card card-sm">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div class="icon-c ic-gold">📱</div>
+          <h3 style="font-size:14px">Consumer App</h3>
+        </div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.6">React Native · iOS + Android. Register, validate meter, pay, receive token — in under 1 minute end-to-end.</p>
+      </div>
+      <div class="card card-sm">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div class="icon-c ic-blue">🖥️</div>
+          <h3 style="font-size:14px">Admin Dashboard</h3>
+        </div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.6">React.js ops centre. Real-time transaction monitoring, manual resolution, financial reconciliation.</p>
+      </div>
+      <div class="card card-sm">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div class="icon-c ic-green">⚙️</div>
+          <h3 style="font-size:14px">Intelligent Backend</h3>
+        </div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.6">Django + DRF · Celery async retry · AES-256 token encryption · 99.5% uptime SLA target.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 4 — MARKET OPPORTUNITY
+═══════════════════════════════════════════════════ -->
+<div class="slide" id="s4">
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-blue" style="width:500px;height:400px;bottom:0;right:-80px;opacity:.5"></div>
+
+  <div class="slide-inner">
+    <div class="slide-num">04 / 12</div>
+    <div class="tag" style="margin-bottom:20px">📈 Market Opportunity</div>
+    <h2 style="margin-bottom:24px">A <span class="accent">₦730B+ Annual</span><br>Untapped Digital Market</h2>
+
+    <div class="grid-2" style="flex:1;align-items:stretch">
+      <!-- Left: Stats -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="grid-2" style="gap:14px">
+          <div class="card" style="text-align:center;padding:20px 16px">
+            <div class="stat-val">1M+</div>
+            <div class="stat-label">Daily Transactions (National)</div>
+          </div>
+          <div class="card" style="text-align:center;padding:20px 16px">
+            <div class="stat-val">11</div>
+            <div class="stat-label">Licensed DISCOs in Nigeria</div>
+          </div>
+          <div class="card" style="text-align:center;padding:20px 16px">
+            <div class="stat-val">₦2K</div>
+            <div class="stat-label">Avg. Transaction Value</div>
+          </div>
+          <div class="card" style="text-align:center;padding:20px 16px">
+            <div class="stat-val">1%</div>
+            <div class="stat-label">Platform Fee per Transaction</div>
+          </div>
+        </div>
+
+        <div class="card" style="border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.04)">
+          <div style="font-size:12px;color:var(--green);font-weight:700;margin-bottom:8px;letter-spacing:.5px">REVENUE MODEL</div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px">
+            <span style="color:var(--muted)">1% fee × ₦2,000 avg. × 1M txns/day</span>
+            <span style="font-weight:700;color:var(--text)">= ₦20M/day</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px">
+            <span style="color:var(--muted)">At 5% market capture (50K txns/day)</span>
+            <span style="font-weight:700;color:var(--green)">= ₦1M/day</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Competitive landscape -->
+      <div class="card" style="padding:22px">
+        <div style="font-size:12px;color:var(--gold);font-weight:700;margin-bottom:14px;letter-spacing:.5px">COMPETITIVE LANDSCAPE</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Competitor</th>
+              <th>Multi-DISCO</th>
+              <th>History</th>
+              <th>Speed</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color:var(--gold)">⚡ ETIP</strong></td>
+              <td><span class="chk">✓</span></td>
+              <td><span class="chk">✓</span></td>
+              <td><span class="chk">&lt;10s</span></td>
+            </tr>
+            <tr>
+              <td>Bank Apps</td>
+              <td><span class="xmark">✗</span></td>
+              <td><span class="chk">✓</span></td>
+              <td><span class="xmark">~60s</span></td>
+            </tr>
+            <tr>
+              <td>DISCO Portals</td>
+              <td><span class="xmark">✗</span></td>
+              <td><span class="xmark">✗</span></td>
+              <td><span class="xmark">~30s</span></td>
+            </tr>
+            <tr>
+              <td>OPay / PalmPay</td>
+              <td><span class="xmark">Partial</span></td>
+              <td><span class="chk">✓</span></td>
+              <td><span class="xmark">~20s</span></td>
+            </tr>
+            <tr>
+              <td>USSD Services</td>
+              <td><span class="xmark">✗</span></td>
+              <td><span class="xmark">✗</span></td>
+              <td><span class="xmark">~45s</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="divider"></div>
+        <div class="quote-box">
+          "ETIP is purpose-built for electricity — faster, more transparent, and multi-DISCO from day one."
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 5 — PRODUCT VISION & KPIs
+═══════════════════════════════════════════════════ -->
+<div class="slide" id="s5">
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-gold" style="width:450px;height:450px;bottom:-80px;left:-80px;opacity:.45"></div>
+
+  <div class="slide-inner">
+    <div class="slide-num">05 / 12</div>
+    <div class="tag" style="margin-bottom:20px">🎯 Objectives & KPIs</div>
+    <h2 style="margin-bottom:6px">What <span class="accent">Success</span><br>Looks Like</h2>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:26px">Measurable targets that define MVP success at 30 and 90 days post-launch.</p>
+
+    <!-- KPI meters -->
+    <div class="grid-2" style="gap:18px;flex:1">
+      <div style="display:flex;flex-direction:column;gap:14px">
+
+        <div class="card card-sm">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:13px;font-weight:600">Token Delivery Success Rate</span>
+            <span class="badge badge-green">≥ 99%</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:99%"></div></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:5px">Primary quality metric — non-negotiable</div>
+        </div>
+
+        <div class="card card-sm">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:13px;font-weight:600">Payment Success Rate</span>
+            <span class="badge badge-green">≥ 99%</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:99%"></div></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:5px">Dual-gateway failover ensures resilience</div>
+        </div>
+
+        <div class="card card-sm">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:13px;font-weight:600">System Uptime SLA</span>
+            <span class="badge badge-blue">≥ 99.5%</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:99.5%"></div></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:5px">≤ 3.65 hours downtime / month</div>
+        </div>
+
+        <div class="card card-sm">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:13px;font-weight:600">API Response Time (p95)</span>
+            <span class="badge badge-gold">≤ 2s</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:75%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:5px">p50 target: ≤ 500ms</div>
+        </div>
+      </div>
+
+      <!-- Growth targets -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card" style="padding:20px">
+          <div style="font-size:12px;color:var(--gold);font-weight:700;margin-bottom:14px;letter-spacing:.5px">GROWTH TARGETS</div>
+          <table>
+            <thead><tr><th>Metric</th><th>30 Days</th><th>90 Days</th></tr></thead>
+            <tbody>
+              <tr><td>Registered Users</td><td style="color:var(--gold)">500</td><td style="color:var(--green)">5,000</td></tr>
+              <tr><td>Monthly Active Users</td><td style="color:var(--gold)">200</td><td style="color:var(--green)">2,000</td></tr>
+              <tr><td>Total Transactions</td><td style="color:var(--gold)">1,000</td><td style="color:var(--green)">15,000</td></tr>
+              <tr><td>Transaction Volume</td><td style="color:var(--gold)">₦1M</td><td style="color:var(--green)">₦20M</td></tr>
+              <tr><td>D30 Retention Rate</td><td style="color:var(--gold)">30%</td><td style="color:var(--green)">40%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card card-sm" style="border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.04)">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div class="icon-c ic-green">🔑</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:4px">Core Hypothesis</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.6">If token delivery exceeds 99% success in under 10s, users will permanently abandon physical vending — validated at soft launch.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 6 — TECH ARCHITECTURE
+═══════════════════════════════════════════════════ -->
+<div class="slide" id="s6">
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-blue" style="width:400px;height:400px;top:-60px;right:-60px;opacity:.45"></div>
+
+  <div class="slide-inner">
+    <div class="slide-num">06 / 12</div>
+    <div class="tag" style="margin-bottom:20px">🏗️ Architecture</div>
+    <h2 style="margin-bottom:22px">Built for <span class="accent">Scale</span>,<br>Designed for <span class="accent">Reliability</span></h2>
+
+    <div class="grid-2" style="flex:1;gap:20px">
+      <!-- Left: Stack -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="card card-sm" style="display:flex;align-items:center;gap:14px">
+          <div class="icon-c ic-blue">📱</div>
+          <div>
+            <div style="font-size:13px;font-weight:700">React Native (Mobile)</div>
+            <div style="font-size:11px;color:var(--muted)">iOS + Android from a single codebase · Redux Toolkit · Axios</div>
+          </div>
+          <span class="badge badge-blue" style="margin-left:auto">Consumer</span>
+        </div>
+        <div class="card card-sm" style="display:flex;align-items:center;gap:14px">
+          <div class="icon-c ic-blue">🖥️</div>
+          <div>
+            <div style="font-size:13px;font-weight:700">React.js + TailwindCSS (Web Admin)</div>
+            <div style="font-size:11px;color:var(--muted)">RBAC-aware · WebSocket live feed · Report exports</div>
+          </div>
+          <span class="badge badge-gold" style="margin-left:auto">Admin</span>
+        </div>
+        <div class="card card-sm" style="display:flex;align-items:center;gap:14px">
+          <div class="icon-c ic-gold">⚙️</div>
+          <div>
+            <div style="font-size:13px;font-weight:700">Django + DRF (API Backend)</div>
+            <div style="font-size:11px;color:var(--muted)">JWT auth · RBAC · OpenAPI 3.0 docs · Custom exception handling</div>
+          </div>
+          <span class="badge badge-gold" style="margin-left:auto">Core</span>
+        </div>
+        <div class="card card-sm" style="display:flex;align-items:center;gap:14px">
+          <div class="icon-c ic-green">🔄</div>
+          <div>
+            <div style="font-size:13px;font-weight:700">Celery + Redis (Task Queue)</div>
+            <div style="font-size:11px;color:var(--muted)">Async token delivery · Retry with backoff · SMS/FCM dispatch</div>
+          </div>
+          <span class="badge badge-green" style="margin-left:auto">Async</span>
+        </div>
+        <div class="card card-sm" style="display:flex;align-items:center;gap:14px">
+          <div class="icon-c ic-gold">🗄️</div>
+          <div>
+            <div style="font-size:13px;font-weight:700">PostgreSQL + Redis Cache</div>
+            <div style="font-size:11px;color:var(--muted)">ACID transactions · AES-256 token encryption · 30-min meter cache</div>
+          </div>
+          <span class="badge badge-blue" style="margin-left:auto">Data</span>
+        </div>
+      </div>
+
+      <!-- Right: Security + NFR highlights -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="card" style="border-color:rgba(245,166,35,.3)">
+          <div style="font-size:12px;color:var(--gold);font-weight:700;margin-bottom:12px;letter-spacing:.5px">🔒 SECURITY BY DESIGN</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center"><span style="color:var(--green)">✓</span> JWT RS256 Auth</div>
+            <div style="font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center"><span style="color:var(--green)">✓</span> AES-256 Encryption</div>
+            <div style="font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center"><span style="color:var(--green)">✓</span> HMAC Webhooks</div>
+            <div style="font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center"><span style="color:var(--green)">✓</span> Idempotency Keys</div>
+            <div style="font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center"><span style="color:var(--green)">✓</span> RBAC + MFA Admin</div>
+            <div style="font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center"><span style="color:var(--green)">✓</span> TLS 1.2+ Only</div>
+            <div style="font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center"><span style="color:var(--green)">✓</span> PCI Out-of-Scope</div>
+            <div style="font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center"><span style="color:var(--green)">✓</span> WAF + DDoS Shield</div>
+          </div>
+        </div>
+
+        <div class="card" style="flex:1">
+          <div style="font-size:12px;color:var(--gold);font-weight:700;margin-bottom:12px;letter-spacing:.5px">⚡ RESILIENCE DESIGN</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;gap:12px;align-items:center">
+              <div style="width:32px;height:32px;border-radius:8px;background:rgba(245,166,35,.1);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🔁</div>
+              <div style="font-size:12px;color:var(--muted)">DISCO API: 3 retries × exponential backoff (2s → 4s → 8s)</div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:center">
+              <div style="width:32px;height:32px;border-radius:8px;background:rgba(59,130,246,.1);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">💳</div>
+              <div style="font-size:12px;color:var(--muted)">Dual gateway: Paystack primary → Flutterwave auto-failover</div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:center">
+              <div style="width:32px;height:32px;border-radius:8px;background:rgba(16,185,129,.1);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">📲</div>
+              <div style="font-size:12px;color:var(--muted)">Notifications: FCM push → SMS fallback on delivery failure</div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:center">
+              <div style="width:32px;height:32px;border-radius:8px;background:rgba(245,166,35,.1);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🏛️</div>
+              <div style="font-size:12px;color:var(--muted)">Webhook-only token trigger — no client-side trust</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 7 — PROGRESS MADE (M1 COMPLETE)
+═══════════════════════════════════════════════════ -->
+<div class="slide" id="s7">
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-green" style="width:500px;height:400px;bottom:-80px;right:-80px;opacity:.45"></div>
+
+  <div class="slide-inner">
+    <div class="slide-num">07 / 12</div>
+    <div class="tag" style="margin-bottom:20px">✅ Progress Made</div>
+    <h2 style="margin-bottom:6px">Milestone 1 <span class="accent">Complete.</span><br>Foundation Is Production-Ready.</h2>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:24px">Week 1–2 of 13. All foundation components built and verified as of February 23, 2026.</p>
+
+    <div class="grid-2" style="flex:1;gap:18px">
+      <!-- Left: What's been built -->
+      <div class="card" style="padding:22px">
+        <div style="font-size:12px;color:var(--green);font-weight:700;margin-bottom:14px;letter-spacing:.5px">🏗️ WHAT'S BUILT (M1)</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span style="color:var(--green);font-size:14px;margin-top:1px">✓</span>
+            <div>
+              <div style="font-size:13px;font-weight:600">Monorepo Structure</div>
+              <div style="font-size:11px;color:var(--muted)">backend/, mobile/, admin/, infra/, docs/ — all scaffolded</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span style="color:var(--green);font-size:14px;margin-top:1px">✓</span>
+            <div>
+              <div style="font-size:13px;font-weight:600">Django + DRF Bootstrap</div>
+              <div style="font-size:11px;color:var(--muted)">5 apps: accounts, meters, transactions, payments, notifications, admin_panel</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span style="color:var(--green);font-size:14px;margin-top:1px">✓</span>
+            <div>
+              <div style="font-size:13px;font-weight:600">Settings Environment Split</div>
+              <div style="font-size:11px;color:var(--muted)">development / production / testing — all configured</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span style="color:var(--green);font-size:14px;margin-top:1px">✓</span>
+            <div>
+              <div style="font-size:13px;font-weight:600">Full Authentication Module</div>
+              <div style="font-size:11px;color:var(--muted)">Register + OTP → JWT login/refresh → logout → password reset</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span style="color:var(--green);font-size:14px;margin-top:1px">✓</span>
+            <div>
+              <div style="font-size:13px;font-weight:600">All Core Data Models</div>
+              <div style="font-size:11px;color:var(--muted)">User, MeterProfile, Transaction (state machine), AdminUser, AuditLog</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span style="color:var(--green);font-size:14px;margin-top:1px">✓</span>
+            <div>
+              <div style="font-size:13px;font-weight:600">Docker Compose Stack</div>
+              <div style="font-size:11px;color:var(--muted)">PostgreSQL 16 + Redis 7 + API + Celery Worker + Celery Beat</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span style="color:var(--green);font-size:14px;margin-top:1px">✓</span>
+            <div>
+              <div style="font-size:13px;font-weight:600">CI/CD Pipeline</div>
+              <div style="font-size:11px;color:var(--muted)">GitHub Actions: lint + test on push, auto-stage on main merge</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span style="color:var(--green);font-size:14px;margin-top:1px">✓</span>
+            <div>
+              <div style="font-size:13px;font-weight:600">Django System Check Passed</div>
+              <div style="font-size:11px;color:var(--muted)">makemigrations clean · 0 errors · All apps recognized</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: overall milestone tracker -->
+      <div class="card" style="padding:22px">
+        <div style="font-size:12px;color:var(--gold);font-weight:700;margin-bottom:16px;letter-spacing:.5px">📅 13-WEEK MILESTONE TRACKER</div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-line-wrap">
+              <div class="tl-dot tl-done"></div>
+              <div class="tl-rod tl-rod-done"></div>
+            </div>
+            <div style="padding-bottom:16px">
+              <div style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px">M1: Foundation <span class="badge badge-green">✓ Done</span></div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px">Project setup · Auth · DB schema · CI/CD · Docker</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-line-wrap">
+              <div class="tl-dot tl-wip"></div>
+              <div class="tl-rod tl-rod-next"></div>
+            </div>
+            <div style="padding-bottom:16px">
+              <div style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px">M2: Core API <span class="badge badge-gold">↗ Next</span></div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px">Meter validation · DISCO client · Transaction state machine</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-line-wrap">
+              <div class="tl-dot tl-next"></div>
+              <div class="tl-rod tl-rod-next"></div>
+            </div>
+            <div style="padding-bottom:16px">
+              <div style="font-size:13px;font-weight:700;color:var(--muted)">M3: Payments</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px">Paystack + Flutterwave · Webhooks · Idempotency</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-line-wrap">
+              <div class="tl-dot tl-next"></div>
+              <div class="tl-rod tl-rod-next"></div>
+            </div>
+            <div style="padding-bottom:16px">
+              <div style="font-size:13px;font-weight:700;color:var(--muted)">M4: Token Delivery</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px">DISCO token API · Retry · FCM + SMS</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-line-wrap">
+              <div class="tl-dot tl-next"></div>
+              <div class="tl-rod tl-rod-next"></div>
+            </div>
+            <div style="padding-bottom:16px">
+              <div style="font-size:13px;font-weight:700;color:var(--muted)">M5–M6: Mobile + Admin</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px">React Native app · React.js admin dashboard</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-line-wrap">
+              <div class="tl-dot tl-next"></div>
+              <div class="tl-rod tl-rod-next" style="opacity:0"></div>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--muted)">M7–M9: QA → Launch</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px">Testing · Security · Soft launch</div>
+            </div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:12px;color:var(--muted)">Overall Progress</div>
+          <div style="font-size:12px;color:var(--gold);font-weight:700">1 of 9 Milestones</div>
+        </div>
+        <div class="bar-track" style="margin-top:8px">
+          <div class="bar-fill" style="width:11%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 8 — CHALLENGES ENCOUNTERED
+═══════════════════════════════════════════════════ -->
+<div class="slide" id="s8">
+  <div class="bg-grid"></div>
+  <div class="bg-glow" style="width:400px;height:400px;top:0;left:50%;background:rgba(239,68,68,.1);opacity:.6;filter:blur(100px)"></div>
+
+  <div class="slide-inner">
+    <div class="slide-num">08 / 12</div>
+    <div class="tag" style="margin-bottom:20px">⚠️ Challenges Encountered</div>
+    <h2 style="margin-bottom:6px">Real Obstacles,<br><span class="accent">Real Solutions.</span></h2>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:24px">Every challenge was identified, diagnosed, and resolved — no blockers remain for M2.</p>
+
+    <div class="grid-2" style="flex:1;gap:16px">
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card" style="border-color:rgba(239,68,68,.25)">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div class="icon-c ic-red" style="flex-shrink:0">🐍</div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                <div style="font-size:13px;font-weight:700">Python 3.14 Incompatibility</div>
+                <span class="badge badge-green">Resolved ✓</span>
+              </div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:8px"><strong style="color:var(--text)">Problem:</strong> psycopg2-binary had no wheel for Python 3.14, breaking the install.</div>
+              <div style="font-size:12px;color:var(--green);line-height:1.6"><strong>Fix:</strong> Migrated to psycopg3 (psycopg[binary]) which fully supports Python 3.14. Zero functionality loss.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-color:rgba(239,68,68,.25)">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div class="icon-c ic-red" style="flex-shrink:0">🐳</div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                <div style="font-size:13px;font-weight:700">Docker Desktop Not Running</div>
+                <span class="badge badge-gold">Workaround Active</span>
+              </div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:8px"><strong style="color:var(--text)">Problem:</strong> Docker Desktop failed to start on Windows, blocking local PostgreSQL + Redis.</div>
+              <div style="font-size:12px;color:var(--gold);line-height:1.6"><strong>Workaround:</strong> Using SQLite in-memory for Django testing settings. Full Docker stack validated in compose file. Resolution: ensure Docker Desktop service is running before M2.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-color:rgba(239,68,68,.25)">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div class="icon-c ic-red" style="flex-shrink:0">📦</div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                <div style="font-size:13px;font-weight:700">WeasyPrint Windows Incompatibility</div>
+                <span class="badge badge-green">Resolved ✓</span>
+              </div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:8px"><strong style="color:var(--text)">Problem:</strong> WeasyPrint (PDF receipts) requires GTK libraries — unavailable on Windows dev machine.</div>
+              <div style="font-size:12px;color:var(--green);line-height:1.6"><strong>Fix:</strong> Replaced with xhtml2pdf which is pure-Python and cross-platform. PDF receipt quality maintained.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card" style="border-color:rgba(245,166,35,.25)">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div class="icon-c ic-gold" style="flex-shrink:0">🔌</div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                <div style="font-size:13px;font-weight:700">DISCO API Access Pending</div>
+                <span class="badge badge-gold">Open — Business</span>
+              </div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:8px"><strong style="color:var(--text)">Problem:</strong> No DISCO sandbox API credentials yet. Blocks M2 real-world meter validation testing.</div>
+              <div style="font-size:12px;color:var(--gold);line-height:1.6"><strong>Mitigation:</strong> Mock DISCO API server to be built in M2 so backend development is not blocked while partnerships are finalized.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-color:rgba(245,166,35,.25)">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div class="icon-c ic-gold" style="flex-shrink:0">💳</div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                <div style="font-size:13px;font-weight:700">Gateway Merchant Accounts</div>
+                <span class="badge badge-gold">Open — Finance</span>
+              </div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:8px"><strong style="color:var(--text)">Problem:</strong> Paystack and Flutterwave merchant accounts not yet approved for live transactions.</div>
+              <div style="font-size:12px;color:var(--gold);line-height:1.6"><strong>Mitigation:</strong> Both gateways provide sandbox/test mode — M3 payment integration will proceed fully with test keys.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-color:rgba(59,130,246,.25)">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div class="icon-c ic-blue" style="flex-shrink:0">⚖️</div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                <div style="font-size:13px;font-weight:700">CBN Regulatory Clearance</div>
+                <span class="badge badge-blue">Parallel Track</span>
+              </div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:8px"><strong style="color:var(--text)">Problem:</strong> CBN intermediary authorization is a prerequisite for live financial transactions.</div>
+              <div style="font-size:12px;color:var(--blue);line-height:1.6"><strong>Plan:</strong> Legal team pursuing CBN authorization in parallel with development. Target: clearance before M7 soft-launch gate.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 9 — RISK REGISTER
+═══════════════════════════════════════════════════ -->
+<div class="slide" id="s9">
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-gold" style="width:400px;height:300px;bottom:0;left:0;opacity:.35"></div>
+
+  <div class="slide-inner">
+    <div class="slide-num">09 / 12</div>
+    <div class="tag" style="margin-bottom:20px">🛡️ Risk Register</div>
+    <h2 style="margin-bottom:20px">Risks Are <span class="accent">Known</span><br>and <span class="accent">Mitigated</span></h2>
+
+    <div class="card" style="flex:1;overflow:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Risk</th>
+            <th>Likelihood</th>
+            <th>Impact</th>
+            <th>Mitigation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>DISCO API downtime / rate limits</strong></td>
+            <td><span class="badge badge-gold">Medium</span></td>
+            <td><span class="badge badge-red">Critical</span></td>
+            <td style="font-size:12px;color:var(--muted)">3× retry + backoff · Queue · Admin alert · SLA in contract</td>
+          </tr>
+          <tr>
+            <td><strong>Payment gateway outage</strong></td>
+            <td><span class="badge badge-green">Low</span></td>
+            <td><span class="badge badge-red">Critical</span></td>
+            <td style="font-size:12px;color:var(--muted)">Dual gateway (Paystack + Flutterwave) · Auto-failover logic</td>
+          </tr>
+          <tr>
+            <td><strong>Token double-generation / double-charge</strong></td>
+            <td><span class="badge badge-green">Low</span></td>
+            <td><span class="badge badge-red">Critical</span></td>
+            <td style="font-size:12px;color:var(--muted)">Idempotency keys · Transaction state machine · DB constraints</td>
+          </tr>
+          <tr>
+            <td><strong>DISCO rejects API partnership</strong></td>
+            <td><span class="badge badge-gold">Medium</span></td>
+            <td><span class="badge badge-red">Critical</span></td>
+            <td style="font-size:12px;color:var(--muted)">Engage 3+ DISCOs simultaneously · Prioritize by user base</td>
+          </tr>
+          <tr>
+            <td><strong>Fraudulent account creation</strong></td>
+            <td><span class="badge badge-gold">Medium</span></td>
+            <td><span class="badge badge-gold">Medium</span></td>
+            <td style="font-size:12px;color:var(--muted)">OTP verification · Rate limiting · Device fingerprinting</td>
+          </tr>
+          <tr>
+            <td><strong>NDPA / CBN regulatory change</strong></td>
+            <td><span class="badge badge-green">Low</span></td>
+            <td><span class="badge badge-red">Critical</span></td>
+            <td style="font-size:12px;color:var(--muted)">Legal monitoring · Modular compliance architecture</td>
+          </tr>
+          <tr>
+            <td><strong>Data breach (user or payment data)</strong></td>
+            <td><span class="badge badge-green">Low</span></td>
+            <td><span class="badge badge-red">Critical</span></td>
+            <td style="font-size:12px;color:var(--muted)">AES-256 · Pen testing · Private VPC · Breach response plan</td>
+          </tr>
+          <tr>
+            <td><strong>Slow token delivery (&gt;10s)</strong></td>
+            <td><span class="badge badge-gold">Medium</span></td>
+            <td><span class="badge badge-gold">Medium</span></td>
+            <td style="font-size:12px;color:var(--muted)">Celery async workers · Alert at 8s threshold · DISCO SLA</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 10 — NEXT STEPS (M2)
+═══════════════════════════════════════════════════ -->
+<div class="slide" id="s10">
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-gold" style="width:500px;height:400px;top:-80px;right:-80px;opacity:.4"></div>
+
+  <div class="slide-inner">
+    <div class="slide-num">10 / 12</div>
+    <div class="tag" style="margin-bottom:20px">🔜 Next Steps — M2</div>
+    <h2 style="margin-bottom:6px">What Happens<br><span class="accent">This Week</span></h2>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:24px">Milestone 2: Core API — Week 3–4 of 13. The engine that powers every transaction.</p>
+
+    <div class="grid-2" style="flex:1;gap:18px">
+      <div style="display:flex;flex-direction:column;gap:12px">
+
+        <div class="card card-sm" style="display:flex;gap:14px;align-items:flex-start;border-color:rgba(245,166,35,.35)">
+          <div style="background:linear-gradient(135deg,var(--gold),var(--amber));color:var(--dark);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0">1</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:4px">Fix Docker Desktop</div>
+            <div style="font-size:12px;color:var(--muted)">Ensure Docker service is running; run <code style="background:var(--panel2);padding:1px 5px;border-radius:3px;font-size:11px">docker compose up -d</code> and verify PostgreSQL + Redis health checks pass.</div>
+          </div>
+        </div>
+
+        <div class="card card-sm" style="display:flex;gap:14px;align-items:flex-start">
+          <div style="background:var(--panel2);color:var(--gold);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;border:1px solid var(--border)">2</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:4px">Build DISCO Abstraction Layer</div>
+            <div style="font-size:12px;color:var(--muted)">DISCOClient base class with concrete implementations per DISCO; retry logic (2s/4s/8s); 8s timeout; mock server for dev.</div>
+          </div>
+        </div>
+
+        <div class="card card-sm" style="display:flex;gap:14px;align-items:flex-start">
+          <div style="background:var(--panel2);color:var(--gold);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;border:1px solid var(--border)">3</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:4px">Meter Validation Endpoint</div>
+            <div style="font-size:12px;color:var(--muted)"><code style="background:var(--panel2);padding:1px 5px;border-radius:3px;font-size:11px">POST /api/v1/meters/validate/</code> — calls DISCO API, returns owner info, caches 30 min in Redis.</div>
+          </div>
+        </div>
+
+        <div class="card card-sm" style="display:flex;gap:14px;align-items:flex-start">
+          <div style="background:var(--panel2);color:var(--gold);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;border:1px solid var(--border)">4</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:4px">Meter Profile CRUD</div>
+            <div style="font-size:12px;color:var(--muted)">Save / update / delete up to 5 named profiles per user. Default auto-selection on purchase screen.</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="card card-sm" style="display:flex;gap:14px;align-items:flex-start">
+          <div style="background:var(--panel2);color:var(--gold);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;border:1px solid var(--border)">5</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:4px">Transaction State Machine</div>
+            <div style="font-size:12px;color:var(--muted)">Enforce strict state transitions: PENDING → SUCCESS | FAILED for both payment_status and token_status.</div>
+          </div>
+        </div>
+
+        <div class="card card-sm" style="display:flex;gap:14px;align-items:flex-start">
+          <div style="background:var(--panel2);color:var(--gold);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;border:1px solid var(--border)">6</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:4px">Transaction Initiate Endpoint</div>
+            <div style="font-size:12px;color:var(--muted)"><code style="background:var(--panel2);padding:1px 5px;border-radius:3px;font-size:11px">POST /api/v1/transactions/initiate/</code> — validates meter, checks ₦500–₦100k limits, creates transaction with unique reference.</div>
+          </div>
+        </div>
+
+        <div class="card card-sm" style="display:flex;gap:14px;align-items:flex-start">
+          <div style="background:var(--panel2);color:var(--gold);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;border:1px solid var(--border)">7</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:4px">Audit Log Middleware</div>
+            <div style="font-size:12px;color:var(--muted)">Auto-log all admin actions to AuditLog — read-only, non-deletable, 2-year retention.</div>
+          </div>
+        </div>
+
+        <div class="card" style="border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.05);padding:16px 20px">
+          <div style="font-size:12px;color:var(--green);font-weight:700;margin-bottom:8px">M2 CHECKPOINT DEFINITION</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.7">
+            ✓ Meter validation works against DISCO sandbox (or mock)<br>
+            ✓ Transactions can be created and queried via API<br>
+            ✓ State transitions enforced at model level<br>
+            ✓ All M2 endpoints covered by integration tests
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 11 — ROADMAP
+═══════════════════════════════════════════════════ -->
+<div class="slide" id="s11">
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-blue" style="width:400px;height:400px;bottom:0;right:0;opacity:.4"></div>
+
+  <div class="slide-inner">
+    <div class="slide-num">11 / 12</div>
+    <div class="tag" style="margin-bottom:20px">🗺️ Roadmap</div>
+    <h2 style="margin-bottom:6px">From MVP to<br><span class="accent">Market Leader</span></h2>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:26px">3-phase product evolution: foundation → intelligence → smart infrastructure.</p>
+
+    <div class="grid-3" style="flex:1;align-items:stretch">
+      <!-- Phase 1 -->
+      <div class="card" style="border-color:rgba(245,166,35,.4);position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold2))"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="font-size:11px;color:var(--gold);font-weight:700;letter-spacing:1px">PHASE 1</div>
+          <span class="badge badge-gold">Q1–Q2 2026</span>
+        </div>
+        <h3 style="margin-bottom:4px;font-size:17px">MVP</h3>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Core token purchase platform</p>
+        <div class="divider"></div>
+        <div style="display:flex;flex-direction:column;gap:7px;font-size:12px;color:var(--muted)">
+          <div>⚡ Consumer mobile app (iOS + Android)</div>
+          <div>⚡ 9+ DISCO integrations</div>
+          <div>⚡ Paystack + Flutterwave payments</div>
+          <div>⚡ Admin dashboard + reconciliation</div>
+          <div>⚡ Push + SMS token delivery</div>
+          <div>⚡ Transaction history + receipts</div>
+        </div>
+        <div class="divider"></div>
+        <div style="font-size:11px;color:var(--gold)">Target: 5,000 users · ₦20M volume/month</div>
+      </div>
+
+      <!-- Phase 2 -->
+      <div class="card" style="border-color:rgba(59,130,246,.3)">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),#60A5FA);border-radius:16px 16px 0 0"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="font-size:11px;color:var(--blue);font-weight:700;letter-spacing:1px">PHASE 2</div>
+          <span class="badge badge-blue">Q3–Q4 2026</span>
+        </div>
+        <h3 style="margin-bottom:4px;font-size:17px">Intelligent Ops</h3>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:14px">AI + automation layer</p>
+        <div class="divider"></div>
+        <div style="display:flex;flex-direction:column;gap:7px;font-size:12px;color:var(--muted)">
+          <div>🤖 AI customer support chatbot</div>
+          <div>🤖 Automated issue triage & escalation</div>
+          <div>📲 USSD + WhatsApp channel</div>
+          <div>👥 Agent / reseller portal</div>
+          <div>💰 Wallet top-up system</div>
+          <div>🔐 BVN-linked enhanced KYC</div>
+          <div>🔄 Automated refund workflows</div>
+        </div>
+        <div class="divider"></div>
+        <div style="font-size:11px;color:var(--blue)">Target: 50,000 users · ₦200M volume/month</div>
+      </div>
+
+      <!-- Phase 3 -->
+      <div class="card" style="border-color:rgba(16,185,129,.3)">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--green),#34D399);border-radius:16px 16px 0 0"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="font-size:11px;color:var(--green);font-weight:700;letter-spacing:1px">PHASE 3</div>
+          <span class="badge badge-green">2027+</span>
+        </div>
+        <h3 style="margin-bottom:4px;font-size:17px">Smart Meter Era</h3>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Infrastructure-level integration</p>
+        <div class="divider"></div>
+        <div style="display:flex;flex-direction:column;gap:7px;font-size:12px;color:var(--muted)">
+          <div>📡 Remote unit injection to smart meters</div>
+          <div>📊 Real-time meter balance & analytics</div>
+          <div>🌍 Multi-country expansion (West Africa)</div>
+          <div>🏭 DISCO hardware API integration</div>
+          <div>🔋 Energy usage insights & alerts</div>
+          <div>🏢 B2B enterprise metering dashboard</div>
+        </div>
+        <div class="divider"></div>
+        <div style="font-size:11px;color:var(--green)">Target: 500,000 users · Pan-African</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 12 — CLOSING / CALL TO ACTION
+═══════════════════════════════════════════════════ -->
+<div class="slide" id="s12">
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-gold"  style="width:600px;height:500px;top:-100px;left:-100px;opacity:.5"></div>
+  <div class="bg-glow glow-green" style="width:400px;height:400px;bottom:-80px;right:-80px;opacity:.45"></div>
+
+  <div class="slide-inner" style="justify-content:center;align-items:center;text-align:center">
+    <div class="float" style="margin-bottom:24px">
+      <div style="width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,var(--gold),var(--amber));display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto;box-shadow:0 0 40px rgba(245,166,35,.4)">⚡</div>
+    </div>
+
+    <div class="tag" style="margin-bottom:20px;display:inline-flex">🇳🇬 ETIP · February 2026</div>
+
+    <h1 style="margin-bottom:18px;max-width:700px">
+      Nigeria Deserves<br>
+      <span class="gradient-text">Electricity in 10 Seconds.</span>
+    </h1>
+
+    <p style="font-size:17px;color:var(--muted);max-width:560px;line-height:1.7;margin-bottom:40px">
+      ETIP is not just a product — it is critical infrastructure. We are building the digital backbone for prepaid electricity distribution across Nigeria, starting today.
+    </p>
+
+    <div style="display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-bottom:48px">
+      <div style="text-align:center">
+        <div class="stat-val">M1</div>
+        <div class="stat-label">Complete ✓</div>
+      </div>
+      <div style="width:1px;background:var(--border)"></div>
+      <div style="text-align:center">
+        <div class="stat-val">11</div>
+        <div class="stat-label">Weeks Remaining</div>
+      </div>
+      <div style="width:1px;background:var(--border)"></div>
+      <div style="text-align:center">
+        <div class="stat-val">13</div>
+        <div class="stat-label">Total Weeks to Launch</div>
+      </div>
+      <div style="width:1px;background:var(--border)"></div>
+      <div style="text-align:center">
+        <div class="stat-val">0</div>
+        <div class="stat-label">P0 Blockers Open</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <div class="card card-sm" style="display:flex;align-items:center;gap:10px;padding:14px 22px;border-color:rgba(245,166,35,.4)">
+        <span>📋</span>
+        <span style="font-size:13px;font-weight:600">Review MVP.md</span>
+      </div>
+      <div class="card card-sm" style="display:flex;align-items:center;gap:10px;padding:14px 22px">
+        <span>📄</span>
+        <span style="font-size:13px;font-weight:600">Review PRD.md</span>
+      </div>
+      <div class="card card-sm" style="display:flex;align-items:center;gap:10px;padding:14px 22px;border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.06)">
+        <span>🚀</span>
+        <span style="font-size:13px;font-weight:600;color:var(--green)">Start M2 Now →</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:20px 72px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);position:relative;z-index:1">
+    <span style="font-size:12px;color:var(--muted)">Electricity Token Intermediary Platform · Confidential · 2026</span>
+    <div style="display:flex;gap:8px">
+      <span class="badge badge-gold">Built with Django + React Native</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- /.deck -->
+
+
+<!-- ── NAVIGATION ──────────────────────────────────────────────── -->
+<nav class="nav">
+  <button onclick="prevSlide()" title="Previous (←)">&#8592;</button>
+  <div class="dots" id="dots"></div>
+  <span id="slide-counter">1 / 12</span>
+  <button onclick="nextSlide()" title="Next (→)">&#8594;</button>
+</nav>
+
+<div class="kbd-hint">
+  <span class="kbd">←</span><span class="kbd">→</span> to navigate &nbsp;·&nbsp;
+  <span class="kbd">F</span> fullscreen
+</div>
+
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total  = slides.length;
+  let current  = 0;
+
+  const pbar    = document.getElementById('pbar');
+  const counter = document.getElementById('slide-counter');
+  const dotsEl  = document.getElementById('dots');
+
+  // Build dots
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  });
+
+  function updateUI() {
+    counter.textContent = `${current + 1} / ${total}`;
+    pbar.style.width = `${((current + 1) / total) * 100}%`;
+    document.querySelectorAll('.dot').forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+    });
+  }
+
+  function goTo(n) {
+    if (n < 0 || n >= total) return;
+    slides[current].classList.remove('active');
+    slides[current].classList.add('exit');
+    setTimeout(() => slides[current < n ? current : n + (n < current ? 1 : 0)]
+      ?.classList.remove('exit'), 600);
+    // clean exit class from old
+    const old = current;
+    setTimeout(() => slides[old].classList.remove('exit'), 600);
+    current = n;
+    slides[current].classList.add('active');
+    updateUI();
+  }
+
+  function nextSlide() { goTo(current + 1); }
+  function prevSlide() { goTo(current - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                    { e.preventDefault(); prevSlide(); }
+    if (e.key === 'f' || e.key === 'F') document.documentElement.requestFullscreen?.();
+    if (e.key === 'Escape' && document.fullscreenElement) document.exitFullscreen?.();
+  });
+
+  // Touch/swipe support
+  let touchX = null;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; });
+  document.addEventListener('touchend',   e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 50) dx < 0 ? nextSlide() : prevSlide();
+    touchX = null;
+  });
+
+  updateUI();
+</script>
+</body>
+</html>

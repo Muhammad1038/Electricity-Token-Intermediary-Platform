@@ -1,0 +1,79 @@
+name: ETIP CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  backend-lint-test:
+    name: Backend — Lint & Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: etip_test_db
+          POSTGRES_USER: etip_user
+          POSTGRES_PASSWORD: etip_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Black (formatting check)
+        run: black --check .
+
+      - name: Run isort (import order check)
+        run: isort --check-only .
+
+      - name: Run Flake8 (linting)
+        run: flake8 .
+
+      - name: Run tests with coverage
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.testing
+          DJANGO_SECRET_KEY: ci-test-secret-key-not-for-production
+          TOKEN_ENCRYPTION_KEY: "3VXCEJhMhMMlYg_NHsqAuMX3_qI8fGUfQwNJOK0GVNk="
+          DB_HOST: localhost
+          DB_NAME: etip_test_db
+          DB_USER: etip_user
+          DB_PASSWORD: etip_password
+        run: pytest
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: backend/htmlcov/

@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ETIP Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            brand: { 50:'#eef7ff', 100:'#d9edff', 200:'#bce0ff', 300:'#8eccff', 400:'#59b0ff', 500:'#3390ff', 600:'#1a6df5', 700:'#1358e1', 800:'#1648b6', 900:'#183e8f', 950:'#132757' },
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .sidebar-link.active { background: rgba(255,255,255,.15); border-left: 3px solid #fff; }
+    .sidebar-link:hover { background: rgba(255,255,255,.1); }
+    .stat-card { transition: transform .15s, box-shadow .15s; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,.1); }
+    .table-row:hover { background: #f8fafc; }
+    .fade-in { animation: fadeIn .3s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .badge { padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+    .badge-success { background:#dcfce7; color:#166534; }
+    .badge-warning { background:#fef9c3; color:#854d0e; }
+    .badge-danger  { background:#fee2e2; color:#991b1b; }
+    .badge-info    { background:#dbeafe; color:#1e40af; }
+    .badge-gray    { background:#f1f5f9; color:#475569; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+  <!-- ═══════════════ LOGIN SCREEN ═══════════════ -->
+  <div id="login-screen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-900 to-brand-700">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 fade-in">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 bg-brand-600 rounded-2xl mx-auto flex items-center justify-center mb-4">
+          <span class="text-3xl">⚡</span>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-900">ETIP Admin</h1>
+        <p class="text-gray-500 mt-1">Electricity Token Intermediary Platform</p>
+      </div>
+      <div id="login-error" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-4 text-sm"></div>
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+          <input type="email" id="login-email" placeholder="admin@etip.ng" required
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <input type="password" id="login-password" placeholder="Enter admin password" required
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition" />
+        </div>
+        <button type="submit" id="login-btn"
+          class="w-full bg-brand-600 text-white py-3 rounded-xl font-semibold hover:bg-brand-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+          Sign In to Admin
+        </button>
+      </form>
+      <p class="text-center text-xs text-gray-400 mt-6">Admin access only. Unauthorized access is logged.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════ MAIN APP SHELL ═══════════════ -->
+  <div id="app-shell" class="hidden min-h-screen flex">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-brand-900 text-white flex flex-col fixed h-full z-20">
+      <div class="px-6 py-5 border-b border-brand-800">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-brand-600 rounded-xl flex items-center justify-center">
+            <span class="text-xl">⚡</span>
+          </div>
+          <div>
+            <h2 class="font-bold text-sm">ETIP Admin</h2>
+            <p class="text-xs text-brand-300" id="admin-name">Administrator</p>
+          </div>
+        </div>
+      </div>
+      <nav class="flex-1 py-4 space-y-1 px-3">
+        <a href="#" data-page="dashboard" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition">
+          <span class="text-lg">📊</span> Dashboard
+        </a>
+        <a href="#" data-page="users" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition">
+          <span class="text-lg">👥</span> Users
+        </a>
+        <a href="#" data-page="transactions" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition">
+          <span class="text-lg">💰</span> Transactions
+        </a>
+        <a href="#" data-page="meters" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition">
+          <span class="text-lg">⚡</span> Meters
+        </a>
+        <a href="#" data-page="audit" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition">
+          <span class="text-lg">📋</span> Audit Logs
+        </a>
+      </nav>
+      <div class="px-3 pb-4">
+        <button id="logout-btn" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-red-500/20 text-red-300 transition">
+          <span class="text-lg">🚪</span> Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1 ml-64">
+      <!-- Top bar -->
+      <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
+        <h1 id="page-title" class="text-xl font-bold text-gray-900">Dashboard</h1>
+        <div class="flex items-center gap-4">
+          <span class="text-sm text-gray-500" id="current-date"></span>
+          <div class="w-9 h-9 bg-brand-100 text-brand-700 rounded-full flex items-center justify-center font-bold text-sm" id="avatar-letter">A</div>
+        </div>
+      </header>
+
+      <!-- Page content area -->
+      <div class="p-6" id="page-content">
+        <!-- Injected by JS -->
+      </div>
+    </main>
+  </div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// ETIP Admin Dashboard — Single Page Application
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Auto-detect backend: same hostname as the browser, port 8000
+const API_BASE = `http://${window.location.hostname}:8000/api/v1`;
+
+// ── State ────────────────────────────────────────────────────────────────────
+let accessToken = localStorage.getItem('admin_access_token') || '';
+let refreshToken = localStorage.getItem('admin_refresh_token') || '';
+let currentUser = JSON.parse(localStorage.getItem('admin_user') || 'null');
+let currentPage = 'dashboard';
+
+// ── API helpers ──────────────────────────────────────────────────────────────
+
+function normalizePhone(raw) {
+  let phone = raw.replace(/[\s\-]/g, '');
+  if (phone.startsWith('0') && phone.length === 11) phone = '+234' + phone.slice(1);
+  else if (phone.startsWith('234') && phone.length === 13) phone = '+' + phone;
+  return phone;
+}
+
+async function api(path, options = {}) {
+  const url = API_BASE + path;
+  const headers = { 'Content-Type': 'application/json', ...options.headers };
+  if (accessToken) headers['Authorization'] = 'Bearer ' + accessToken;
+
+  let res = await fetch(url, { ...options, headers });
+
+  // Try token refresh on 401
+  if (res.status === 401 && refreshToken) {
+    const refreshRes = await fetch(API_BASE + '/auth/token/refresh/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh: refreshToken }),
+    });
+    if (refreshRes.ok) {
+      const data = await refreshRes.json();
+      accessToken = data.access;
+      localStorage.setItem('admin_access_token', accessToken);
+      headers['Authorization'] = 'Bearer ' + accessToken;
+      res = await fetch(url, { ...options, headers });
+    } else {
+      doLogout();
+      throw new Error('Session expired');
+    }
+  }
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || err.detail || `Error ${res.status}`);
+  }
+  return res.json();
+}
+
+// ── Auth ─────────────────────────────────────────────────────────────────────
+
+async function doLogin(email, password) {
+  const res = await fetch(API_BASE + '/auth/login/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || data.detail || 'Login failed');
+
+  accessToken = data.data.access;
+  refreshToken = data.data.refresh;
+  localStorage.setItem('admin_access_token', accessToken);
+  localStorage.setItem('admin_refresh_token', refreshToken);
+
+  // Fetch profile and verify admin status
+  const profile = await api('/auth/profile/');
+  currentUser = profile.data;
+  localStorage.setItem('admin_user', JSON.stringify(currentUser));
+
+  // Test admin access
+  try {
+    await api('/admin/dashboard/');
+  } catch (e) {
+    doLogout();
+    throw new Error('This account does not have admin privileges.');
+  }
+
+  return currentUser;
+}
+
+function doLogout() {
+  accessToken = '';
+  refreshToken = '';
+  currentUser = null;
+  localStorage.removeItem('admin_access_token');
+  localStorage.removeItem('admin_refresh_token');
+  localStorage.removeItem('admin_user');
+  showLogin();
+}
+
+// ── Navigation ───────────────────────────────────────────────────────────────
+
+function showLogin() {
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('app-shell').classList.add('hidden');
+}
+
+function showApp() {
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app-shell').classList.remove('hidden');
+  document.getElementById('admin-name').textContent = currentUser?.full_name || 'Admin';
+  document.getElementById('avatar-letter').textContent = (currentUser?.full_name || 'A')[0].toUpperCase();
+  document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-NG', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  navigateTo('dashboard');
+}
+
+function navigateTo(page) {
+  currentPage = page;
+  document.querySelectorAll('.sidebar-link').forEach(el => {
+    el.classList.toggle('active', el.dataset.page === page);
+  });
+
+  const titles = { dashboard:'Dashboard', users:'User Management', transactions:'Transaction Monitor', meters:'Meter Management', audit:'Audit Logs' };
+  document.getElementById('page-title').textContent = titles[page] || 'Dashboard';
+
+  const content = document.getElementById('page-content');
+  content.innerHTML = '<div class="flex items-center justify-center py-20"><div class="animate-spin w-8 h-8 border-4 border-brand-600 border-t-transparent rounded-full"></div></div>';
+
+  switch(page) {
+    case 'dashboard': renderDashboard(); break;
+    case 'users': renderUsers(); break;
+    case 'transactions': renderTransactions(); break;
+    case 'meters': renderMeters(); break;
+    case 'audit': renderAuditLogs(); break;
+  }
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function formatMoney(v) { return '₦' + Number(v || 0).toLocaleString('en-NG', { minimumFractionDigits: 0 }); }
+function formatDate(d) { if (!d) return 'N/A'; return new Date(d).toLocaleString('en-NG', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }); }
+function shortDate(d) { if (!d) return 'N/A'; return new Date(d).toLocaleDateString('en-NG', { month:'short', day:'numeric', year:'numeric' }); }
+
+function statusBadge(status) {
+  const map = {
+    SUCCESS:'badge-success', DELIVERED:'badge-success', COMPLETED:'badge-success',
+    PENDING:'badge-warning', PROCESSING:'badge-warning',
+    FAILED:'badge-danger', EXPIRED:'badge-danger',
+  };
+  return `<span class="badge ${map[status] || 'badge-gray'}">${status}</span>`;
+}
+
+function escapeHtml(s) {
+  const el = document.createElement('span');
+  el.textContent = s || '';
+  return el.innerHTML;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PAGE: DASHBOARD
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function renderDashboard() {
+  const content = document.getElementById('page-content');
+  try {
+    const res = await api('/admin/dashboard/');
+    const s = res.data;
+
+    content.innerHTML = `
+      <div class="fade-in">
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+          <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-2xl">👥</span>
+              <span class="text-xs font-semibold text-brand-600 bg-brand-50 px-2 py-1 rounded-full">USERS</span>
+            </div>
+            <p class="text-3xl font-bold text-gray-900">${s.total_users}</p>
+            <p class="text-sm text-gray-500 mt-1">Total registered users</p>
+          </div>
+          <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-2xl">💰</span>
+              <span class="text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-full">REVENUE</span>
+            </div>
+            <p class="text-3xl font-bold text-gray-900">${formatMoney(s.total_revenue)}</p>
+            <p class="text-sm text-gray-500 mt-1">Total successful revenue</p>
+          </div>
+          <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-2xl">📦</span>
+              <span class="text-xs font-semibold text-purple-600 bg-purple-50 px-2 py-1 rounded-full">TRANSACTIONS</span>
+            </div>
+            <p class="text-3xl font-bold text-gray-900">${s.total_transactions}</p>
+            <p class="text-sm text-gray-500 mt-1">All time transactions</p>
+          </div>
+          <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-2xl">⚡</span>
+              <span class="text-xs font-semibold text-orange-600 bg-orange-50 px-2 py-1 rounded-full">TOKENS</span>
+            </div>
+            <p class="text-3xl font-bold text-gray-900">${s.delivered_tokens}</p>
+            <p class="text-sm text-gray-500 mt-1">Tokens delivered</p>
+          </div>
+        </div>
+
+        <!-- Second row: Payment & Token Breakdown -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <!-- Payment Status -->
+          <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+            <h3 class="font-bold text-gray-900 mb-4">Payment Status Breakdown</h3>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-green-500"></div><span class="text-sm text-gray-600">Successful</span></div>
+                <span class="font-semibold text-gray-900">${s.successful_payments}</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-green-500 h-2 rounded-full" style="width:${s.total_transactions ? (s.successful_payments/s.total_transactions*100) : 0}%"></div></div>
+
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-yellow-500"></div><span class="text-sm text-gray-600">Pending</span></div>
+                <span class="font-semibold text-gray-900">${s.pending_payments}</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-yellow-500 h-2 rounded-full" style="width:${s.total_transactions ? (s.pending_payments/s.total_transactions*100) : 0}%"></div></div>
+
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-red-500"></div><span class="text-sm text-gray-600">Failed</span></div>
+                <span class="font-semibold text-gray-900">${s.failed_payments}</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-red-500 h-2 rounded-full" style="width:${s.total_transactions ? (s.failed_payments/s.total_transactions*100) : 0}%"></div></div>
+            </div>
+          </div>
+
+          <!-- Token Status -->
+          <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+            <h3 class="font-bold text-gray-900 mb-4">Token Delivery Status</h3>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-green-500"></div><span class="text-sm text-gray-600">Delivered</span></div>
+                <span class="font-semibold text-gray-900">${s.delivered_tokens}</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-green-500 h-2 rounded-full" style="width:${s.total_transactions ? (s.delivered_tokens/s.total_transactions*100) : 0}%"></div></div>
+
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-yellow-500"></div><span class="text-sm text-gray-600">Pending</span></div>
+                <span class="font-semibold text-gray-900">${s.pending_tokens}</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-yellow-500 h-2 rounded-full" style="width:${s.total_transactions ? (s.pending_tokens/s.total_transactions*100) : 0}%"></div></div>
+
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-red-500"></div><span class="text-sm text-gray-600">Failed</span></div>
+                <span class="font-semibold text-gray-900">${s.failed_tokens}</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-red-500 h-2 rounded-full" style="width:${s.total_transactions ? (s.failed_tokens/s.total_transactions*100) : 0}%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts row: Revenue Trend + Token Delivery -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+            <h3 class="font-bold text-gray-900 mb-4">30-Day Revenue Trend</h3>
+            <canvas id="revenueChart" height="200"></canvas>
+          </div>
+          <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+            <h3 class="font-bold text-gray-900 mb-4">Token Delivery Overview</h3>
+            <canvas id="tokenChart" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Revenue line chart
+    let revenueData = { labels: [], values: [] };
+    try {
+      const rev = await api('/admin/daily-revenue/');
+      revenueData.labels = rev.data.map(r => r.date);
+      revenueData.values = rev.data.map(r => r.revenue);
+    } catch(_) {}
+    new Chart(document.getElementById('revenueChart'), {
+      type: 'line',
+      data: {
+        labels: revenueData.labels,
+        datasets: [{
+          label: 'Revenue (₦)',
+          data: revenueData.values,
+          borderColor: '#1a6df5',
+          backgroundColor: 'rgba(26,109,245,0.08)',
+          borderWidth: 2,
+          pointRadius: 3,
+          fill: true,
+          tension: 0.3,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { maxTicksLimit: 10, font: { size: 10 } }, grid: { display: false } },
+          y: { ticks: { callback: v => '₦' + Number(v).toLocaleString('en-NG', { notation: 'compact' }) } }
+        }
+      }
+    });
+
+    // Token delivery doughnut
+    new Chart(document.getElementById('tokenChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Delivered', 'Pending', 'Failed'],
+        datasets: [{ data: [s.delivered_tokens, s.pending_tokens, s.failed_tokens], backgroundColor: ['#22c55e','#eab308','#ef4444'], borderWidth: 0 }]
+      },
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+
+  } catch (e) {
+    content.innerHTML = `<div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4">${escapeHtml(e.message)}</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PAGE: USERS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+let usersPage = 1;
+let usersSearch = '';
+
+async function renderUsers() {
+  const content = document.getElementById('page-content');
+  try {
+    const params = new URLSearchParams({ page: usersPage });
+    if (usersSearch) params.set('search', usersSearch);
+    const res = await api('/admin/users/?' + params);
+    const users = res.results || res.data || [];
+    const count = res.count || users.length;
+    const totalPages = Math.ceil(count / 20) || 1;
+
+    content.innerHTML = `
+      <div class="fade-in">
+        <!-- Search bar -->
+        <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm mb-6 flex items-center gap-4">
+          <div class="flex-1 relative">
+            <input type="text" id="user-search" placeholder="Search by phone or name..." value="${escapeHtml(usersSearch)}"
+              class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-sm" />
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+          </div>
+          <button onclick="usersSearch=document.getElementById('user-search').value; usersPage=1; renderUsers();"
+            class="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-brand-700 transition">Search</button>
+          ${usersSearch ? `<button onclick="usersSearch=''; usersPage=1; renderUsers();" class="text-sm text-gray-500 hover:text-gray-700">Clear</button>` : ''}
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <p class="text-sm text-gray-500"><span class="font-semibold text-gray-900">${count}</span> users found</p>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-3">User</th>
+                  <th class="px-6 py-3">Phone</th>
+                  <th class="px-6 py-3">Status</th>
+                  <th class="px-6 py-3">Transactions</th>
+                  <th class="px-6 py-3">Joined</th>
+                  <th class="px-6 py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                ${users.map(u => `
+                  <tr class="table-row">
+                    <td class="px-6 py-4">
+                      <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-sm">${(u.full_name||'U')[0].toUpperCase()}</div>
+                        <div>
+                          <p class="font-medium text-gray-900 text-sm">${escapeHtml(u.full_name || 'No name')}</p>
+                          <p class="text-xs text-gray-400">${escapeHtml(u.email || 'No email')}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm font-mono text-gray-700">${escapeHtml(u.phone_number)}</td>
+                    <td class="px-6 py-4">
+                      ${u.is_active
+                        ? `<span class="badge badge-success">Active</span>`
+                        : `<span class="badge badge-danger">Suspended</span>`}
+                      ${u.is_verified ? '<span class="badge badge-info ml-1">Verified</span>' : ''}
+                    </td>
+                    <td class="px-6 py-4 text-sm font-semibold text-gray-700">${u.transaction_count ?? 0}</td>
+                    <td class="px-6 py-4 text-sm text-gray-500">${shortDate(u.created_at)}</td>
+                    <td class="px-6 py-4">
+                      <button onclick="toggleSuspend('${u.id}', ${u.is_active})"
+                        class="text-xs font-semibold px-3 py-1.5 rounded-lg transition ${u.is_active
+                          ? 'bg-red-50 text-red-600 hover:bg-red-100'
+                          : 'bg-green-50 text-green-600 hover:bg-green-100'}">
+                        ${u.is_active ? 'Suspend' : 'Reactivate'}
+                      </button>
+                    </td>
+                  </tr>
+                `).join('')}
+                ${users.length === 0 ? '<tr><td colspan="6" class="px-6 py-12 text-center text-gray-400">No users found</td></tr>' : ''}
+              </tbody>
+            </table>
+          </div>
+          <!-- Pagination -->
+          <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+            <p class="text-sm text-gray-500">Page ${usersPage} of ${totalPages}</p>
+            <div class="flex gap-2">
+              <button onclick="if(usersPage>1){usersPage--;renderUsers()}" ${usersPage<=1?'disabled':''} class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-40 transition">← Prev</button>
+              <button onclick="if(usersPage<${totalPages}){usersPage++;renderUsers()}" ${usersPage>=totalPages?'disabled':''} class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-40 transition">Next →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Enter key triggers search
+    document.getElementById('user-search')?.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { usersSearch = e.target.value; usersPage = 1; renderUsers(); }
+    });
+
+  } catch (e) {
+    content.innerHTML = `<div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4">${escapeHtml(e.message)}</div>`;
+  }
+}
+
+async function toggleSuspend(userId, isActive) {
+  const action = isActive ? 'suspend' : 'reactivate';
+  const reason = prompt(`Reason to ${action} this user (optional):`);
+  if (reason === null) return; // cancelled
+  try {
+    await api(`/admin/users/${userId}/suspend/`, {
+      method: 'POST',
+      body: JSON.stringify({ reason: reason || '' }),
+    });
+    alert(`User ${action}d successfully.`);
+    renderUsers();
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PAGE: TRANSACTIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+let txPage = 1;
+let txSearch = '';
+let txPaymentStatus = '';
+let txTokenStatus = '';
+
+async function renderTransactions() {
+  const content = document.getElementById('page-content');
+  try {
+    const params = new URLSearchParams({ page: txPage });
+    if (txSearch) params.set('search', txSearch);
+    if (txPaymentStatus) params.set('payment_status', txPaymentStatus);
+    if (txTokenStatus) params.set('token_status', txTokenStatus);
+    const res = await api('/admin/transactions/?' + params);
+    const txns = res.results || res.data || [];
+    const count = res.count || txns.length;
+    const totalPages = Math.ceil(count / 20) || 1;
+
+    content.innerHTML = `
+      <div class="fade-in">
+        <!-- Filters -->
+        <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm mb-6">
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="flex-1 min-w-[200px] relative">
+              <input type="text" id="tx-search" placeholder="Search reference, meter, owner..." value="${escapeHtml(txSearch)}"
+                class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-sm" />
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+            </div>
+            <select id="tx-payment-filter" onchange="txPaymentStatus=this.value; txPage=1; renderTransactions();"
+              class="px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+              <option value="">All Payments</option>
+              <option value="PENDING" ${txPaymentStatus==='PENDING'?'selected':''}>Pending</option>
+              <option value="SUCCESS" ${txPaymentStatus==='SUCCESS'?'selected':''}>Success</option>
+              <option value="FAILED" ${txPaymentStatus==='FAILED'?'selected':''}>Failed</option>
+            </select>
+            <select id="tx-token-filter" onchange="txTokenStatus=this.value; txPage=1; renderTransactions();"
+              class="px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+              <option value="">All Tokens</option>
+              <option value="PENDING" ${txTokenStatus==='PENDING'?'selected':''}>Pending</option>
+              <option value="DELIVERED" ${txTokenStatus==='DELIVERED'?'selected':''}>Delivered</option>
+              <option value="FAILED" ${txTokenStatus==='FAILED'?'selected':''}>Failed</option>
+            </select>
+            <button onclick="txSearch=document.getElementById('tx-search').value; txPage=1; renderTransactions();"
+              class="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-brand-700 transition">Filter</button>
+            ${(txSearch||txPaymentStatus||txTokenStatus) ? `<button onclick="txSearch=''; txPaymentStatus=''; txTokenStatus=''; txPage=1; renderTransactions();" class="text-sm text-gray-500 hover:text-gray-700">Clear All</button>` : ''}
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100">
+            <p class="text-sm text-gray-500"><span class="font-semibold text-gray-900">${count}</span> transactions</p>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th class="px-5 py-3">Reference</th>
+                  <th class="px-5 py-3">User</th>
+                  <th class="px-5 py-3">Meter</th>
+                  <th class="px-5 py-3">DISCO</th>
+                  <th class="px-5 py-3">Amount</th>
+                  <th class="px-5 py-3">Payment</th>
+                  <th class="px-5 py-3">Token</th>
+                  <th class="px-5 py-3">Date</th>
+                  <th class="px-5 py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                ${txns.map(t => `
+                  <tr class="table-row">
+                    <td class="px-5 py-3 text-xs font-mono text-gray-700">${escapeHtml((t.reference||'').slice(0,12))}…</td>
+                    <td class="px-5 py-3 text-sm text-gray-700">${escapeHtml(t.user_phone)}</td>
+                    <td class="px-5 py-3 text-sm font-mono text-gray-600">${escapeHtml(t.meter_number)}</td>
+                    <td class="px-5 py-3 text-sm">${escapeHtml(t.disco)}</td>
+                    <td class="px-5 py-3 text-sm font-semibold">${formatMoney(t.total_amount || t.amount)}</td>
+                    <td class="px-5 py-3">${statusBadge(t.payment_status)}</td>
+                    <td class="px-5 py-3">${statusBadge(t.token_status)}</td>
+                    <td class="px-5 py-3 text-xs text-gray-500">${shortDate(t.created_at)}</td>
+                    <td class="px-5 py-3">
+                      <div class="flex gap-1">
+                        <button onclick="viewTransaction('${t.id}')" class="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-brand-50 text-brand-600 hover:bg-brand-100 transition">View</button>
+                        ${!t.is_resolved ? `<button onclick="resolveTransaction('${t.id}', '${escapeHtml(t.reference)}')" class="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-100 transition">Resolve</button>` : '<span class="badge badge-success">Resolved</span>'}
+                      </div>
+                    </td>
+                  </tr>
+                `).join('')}
+                ${txns.length === 0 ? '<tr><td colspan="9" class="px-6 py-12 text-center text-gray-400">No transactions found</td></tr>' : ''}
+              </tbody>
+            </table>
+          </div>
+          <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+            <p class="text-sm text-gray-500">Page ${txPage} of ${totalPages}</p>
+            <div class="flex gap-2">
+              <button onclick="if(txPage>1){txPage--;renderTransactions()}" ${txPage<=1?'disabled':''} class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-40 transition">← Prev</button>
+              <button onclick="if(txPage<${totalPages}){txPage++;renderTransactions()}" ${txPage>=totalPages?'disabled':''} class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-40 transition">Next →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('tx-search')?.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { txSearch = e.target.value; txPage = 1; renderTransactions(); }
+    });
+
+  } catch (e) {
+    content.innerHTML = `<div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4">${escapeHtml(e.message)}</div>`;
+  }
+}
+
+async function viewTransaction(id) {
+  try {
+    const res = await api(`/admin/transactions/${id}/`);
+    const t = res.data;
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 fade-in';
+    modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+    modal.innerHTML = `
+      <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h3 class="font-bold text-gray-900">Transaction Detail</h3>
+          <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+        </div>
+        <div class="px-6 py-4 space-y-3 text-sm">
+          <div class="grid grid-cols-2 gap-3">
+            <div><p class="text-gray-400 text-xs">Reference</p><p class="font-mono text-gray-900 break-all">${escapeHtml(t.reference)}</p></div>
+            <div><p class="text-gray-400 text-xs">Gateway</p><p class="text-gray-900">${escapeHtml(t.payment_gateway)}</p></div>
+            <div><p class="text-gray-400 text-xs">User</p><p class="text-gray-900">${escapeHtml(t.user_name)} (${escapeHtml(t.user_phone)})</p></div>
+            <div><p class="text-gray-400 text-xs">DISCO</p><p class="text-gray-900">${escapeHtml(t.disco)}</p></div>
+            <div><p class="text-gray-400 text-xs">Meter</p><p class="font-mono text-gray-900">${escapeHtml(t.meter_number)}</p></div>
+            <div><p class="text-gray-400 text-xs">Meter Owner</p><p class="text-gray-900">${escapeHtml(t.meter_owner_name)}</p></div>
+            <div><p class="text-gray-400 text-xs">Amount</p><p class="font-semibold text-gray-900">${formatMoney(t.amount)}</p></div>
+            <div><p class="text-gray-400 text-xs">Service Fee</p><p class="text-gray-900">${formatMoney(t.service_fee)}</p></div>
+            <div><p class="text-gray-400 text-xs">Total</p><p class="font-bold text-gray-900">${formatMoney(t.total_amount)}</p></div>
+            <div><p class="text-gray-400 text-xs">Payment Status</p><p>${statusBadge(t.payment_status)}</p></div>
+            <div><p class="text-gray-400 text-xs">Token Status</p><p>${statusBadge(t.token_status)}</p></div>
+            <div><p class="text-gray-400 text-xs">Resend Attempts</p><p class="text-gray-900">${t.resend_attempts}</p></div>
+            <div><p class="text-gray-400 text-xs">Created</p><p class="text-gray-900">${formatDate(t.created_at)}</p></div>
+            <div><p class="text-gray-400 text-xs">Payment Confirmed</p><p class="text-gray-900">${formatDate(t.payment_confirmed_at)}</p></div>
+            ${t.is_resolved ? `<div class="col-span-2"><p class="text-gray-400 text-xs">Resolution</p><p class="text-gray-900">${escapeHtml(t.resolution_notes)} — by ${escapeHtml(t.resolved_by_email||'N/A')} at ${formatDate(t.resolved_at)}</p></div>` : ''}
+          </div>
+          ${t.gateway_reference ? `<div><p class="text-gray-400 text-xs">Gateway Reference</p><p class="font-mono text-gray-900 break-all">${escapeHtml(t.gateway_reference)}</p></div>` : ''}
+          ${t.ip_address ? `<div><p class="text-gray-400 text-xs">IP Address</p><p class="text-gray-900">${escapeHtml(t.ip_address)}</p></div>` : ''}
+        </div>
+        <div class="px-6 py-4 border-t border-gray-100 flex justify-end">
+          <button onclick="this.closest('.fixed').remove()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition">Close</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  } catch (e) {
+    alert('Error loading transaction: ' + e.message);
+  }
+}
+
+async function resolveTransaction(id, ref) {
+  const notes = prompt(`Resolution notes for ${ref}:`);
+  if (!notes) return;
+  try {
+    await api(`/admin/transactions/${id}/resolve/`, {
+      method: 'POST',
+      body: JSON.stringify({ resolution_notes: notes }),
+    });
+    alert('Transaction resolved.');
+    renderTransactions();
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PAGE: METERS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+let metersPage = 1;
+let metersSearch = '';
+let metersActiveOnly = false;
+
+async function renderMeters() {
+  const content = document.getElementById('page-content');
+  try {
+    const params = new URLSearchParams({ page: metersPage });
+    if (metersSearch) params.set('search', metersSearch);
+    if (metersActiveOnly) params.set('active', '1');
+    const res = await api('/admin/meters/?' + params);
+    const meters = res.results || [];
+    const count = res.count || meters.length;
+    const totalPages = Math.ceil(count / 20) || 1;
+
+    content.innerHTML = `
+      <div class="fade-in">
+        <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm mb-6">
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="flex-1 min-w-[200px] relative">
+              <input type="text" id="meter-search" placeholder="Search meter #, email, owner, DISCO..." value="${escapeHtml(metersSearch)}"
+                class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm" />
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+            </div>
+            <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+              <input type="checkbox" id="meter-active-filter" ${metersActiveOnly ? 'checked' : ''}
+                class="rounded" onchange="metersActiveOnly=this.checked; metersPage=1; renderMeters();" />
+              Active only
+            </label>
+            <button onclick="metersSearch=document.getElementById('meter-search').value; metersPage=1; renderMeters();"
+              class="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-brand-700 transition">Search</button>
+            ${(metersSearch||metersActiveOnly) ? `<button onclick="metersSearch=''; metersActiveOnly=false; metersPage=1; renderMeters();" class="text-sm text-gray-500 hover:text-gray-700">Clear</button>` : ''}
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100">
+            <p class="text-sm text-gray-500"><span class="font-semibold text-gray-900">${count}</span> meters</p>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th class="px-5 py-3">Meter #</th>
+                  <th class="px-5 py-3">Owner</th>
+                  <th class="px-5 py-3">DISCO</th>
+                  <th class="px-5 py-3">User</th>
+                  <th class="px-5 py-3">Type</th>
+                  <th class="px-5 py-3">Status</th>
+                  <th class="px-5 py-3">Added</th>
+                  <th class="px-5 py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                ${meters.map(m => `
+                  <tr class="table-row">
+                    <td class="px-5 py-3">
+                      <p class="font-mono text-sm text-gray-900">${escapeHtml(m.meter_number)}</p>
+                      ${m.nickname ? `<p class="text-xs text-gray-400">${escapeHtml(m.nickname)}</p>` : ''}
+                      ${m.is_default ? '<span class="badge badge-info" style="font-size:10px">DEFAULT</span>' : ''}
+                    </td>
+                    <td class="px-5 py-3 text-sm text-gray-700">${escapeHtml(m.meter_owner_name || 'N/A')}</td>
+                    <td class="px-5 py-3 text-sm text-gray-700">${escapeHtml(m.disco)}</td>
+                    <td class="px-5 py-3">
+                      <p class="text-sm text-gray-900">${escapeHtml(m.user_name || '—')}</p>
+                      <p class="text-xs text-gray-400">${escapeHtml(m.user_email)}</p>
+                    </td>
+                    <td class="px-5 py-3 text-xs text-gray-600">${escapeHtml(m.meter_type || 'N/A')}</td>
+                    <td class="px-5 py-3">
+                      ${m.is_active
+                        ? '<span class="badge badge-success">Active</span>'
+                        : '<span class="badge badge-gray">Inactive</span>'}
+                    </td>
+                    <td class="px-5 py-3 text-xs text-gray-500">${shortDate(m.created_at)}</td>
+                    <td class="px-5 py-3">
+                      ${m.is_active
+                        ? `<button onclick="deactivateMeter('${m.id}', '${escapeHtml(m.meter_number)}')"
+                            class="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition">Deactivate</button>`
+                        : '<span class="text-xs text-gray-400">Inactive</span>'}
+                    </td>
+                  </tr>
+                `).join('')}
+                ${meters.length === 0 ? '<tr><td colspan="8" class="px-6 py-12 text-center text-gray-400">No meters found</td></tr>' : ''}
+              </tbody>
+            </table>
+          </div>
+          <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+            <p class="text-sm text-gray-500">Page ${metersPage} of ${totalPages}</p>
+            <div class="flex gap-2">
+              <button onclick="if(metersPage>1){metersPage--;renderMeters()}" ${metersPage<=1?'disabled':''} class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-40 transition">← Prev</button>
+              <button onclick="if(metersPage<${totalPages}){metersPage++;renderMeters()}" ${metersPage>=totalPages?'disabled':''} class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-40 transition">Next →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('meter-search')?.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { metersSearch = e.target.value; metersPage = 1; renderMeters(); }
+    });
+
+  } catch (e) {
+    content.innerHTML = `<div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4">${escapeHtml(e.message)}</div>`;
+  }
+}
+
+async function deactivateMeter(id, meterNum) {
+  if (!confirm(`Deactivate meter ${meterNum}? The user will no longer be able to use it.`)) return;
+  try {
+    await api(`/admin/meters/${id}/deactivate/`, { method: 'POST' });
+    alert('Meter deactivated.');
+    renderMeters();
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PAGE: AUDIT LOGS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+let auditPage = 1;
+let auditSearch = '';
+let auditAction = '';
+
+async function renderAuditLogs() {
+  const content = document.getElementById('page-content');
+  try {
+    const params = new URLSearchParams({ page: auditPage });
+    if (auditSearch) params.set('search', auditSearch);
+    if (auditAction) params.set('action', auditAction);
+    const res = await api('/admin/audit-logs/?' + params);
+    const logs = res.results || res.data || [];
+    const count = res.count || logs.length;
+    const totalPages = Math.ceil(count / 20) || 1;
+
+    content.innerHTML = `
+      <div class="fade-in">
+        <!-- Filters -->
+        <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm mb-6 flex flex-wrap items-center gap-3">
+          <div class="flex-1 min-w-[200px] relative">
+            <input type="text" id="audit-search" placeholder="Search by actor or target..." value="${escapeHtml(auditSearch)}"
+              class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-sm" />
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+          </div>
+          <select id="audit-action-filter" onchange="auditAction=this.value; auditPage=1; renderAuditLogs();"
+            class="px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+            <option value="">All Actions</option>
+            <option value="user.suspend" ${auditAction==='user.suspend'?'selected':''}>User Suspend</option>
+            <option value="user.reactivate" ${auditAction==='user.reactivate'?'selected':''}>User Reactivate</option>
+            <option value="transaction.resolve" ${auditAction==='transaction.resolve'?'selected':''}>Transaction Resolve</option>
+            <option value="admin.create" ${auditAction==='admin.create'?'selected':''}>Admin Create</option>
+            <option value="admin.login" ${auditAction==='admin.login'?'selected':''}>Admin Login</option>
+          </select>
+          <button onclick="auditSearch=document.getElementById('audit-search').value; auditPage=1; renderAuditLogs();"
+            class="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-brand-700 transition">Filter</button>
+          ${(auditSearch||auditAction) ? `<button onclick="auditSearch=''; auditAction=''; auditPage=1; renderAuditLogs();" class="text-sm text-gray-500 hover:text-gray-700">Clear</button>` : ''}
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100">
+            <p class="text-sm text-gray-500"><span class="font-semibold text-gray-900">${count}</span> log entries</p>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-3">Timestamp</th>
+                  <th class="px-6 py-3">Actor</th>
+                  <th class="px-6 py-3">Action</th>
+                  <th class="px-6 py-3">Target</th>
+                  <th class="px-6 py-3">IP Address</th>
+                  <th class="px-6 py-3">Details</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                ${logs.map(l => `
+                  <tr class="table-row">
+                    <td class="px-6 py-3 text-xs text-gray-500 whitespace-nowrap">${formatDate(l.timestamp)}</td>
+                    <td class="px-6 py-3 text-sm font-medium text-gray-900">${escapeHtml(l.actor_label)}</td>
+                    <td class="px-6 py-3"><span class="badge badge-info">${escapeHtml(l.action)}</span></td>
+                    <td class="px-6 py-3 text-sm text-gray-700">${escapeHtml(l.target_type)}${l.target_id ? ':' + escapeHtml(l.target_id).slice(0,8) + '…' : ''}</td>
+                    <td class="px-6 py-3 text-xs font-mono text-gray-500">${escapeHtml(l.ip_address || 'N/A')}</td>
+                    <td class="px-6 py-3 text-xs text-gray-500 max-w-xs truncate">${escapeHtml(JSON.stringify(l.metadata || {})).slice(0, 80)}</td>
+                  </tr>
+                `).join('')}
+                ${logs.length === 0 ? '<tr><td colspan="6" class="px-6 py-12 text-center text-gray-400">No audit logs found</td></tr>' : ''}
+              </tbody>
+            </table>
+          </div>
+          <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+            <p class="text-sm text-gray-500">Page ${auditPage} of ${totalPages}</p>
+            <div class="flex gap-2">
+              <button onclick="if(auditPage>1){auditPage--;renderAuditLogs()}" ${auditPage<=1?'disabled':''} class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-40 transition">← Prev</button>
+              <button onclick="if(auditPage<${totalPages}){auditPage++;renderAuditLogs()}" ${auditPage>=totalPages?'disabled':''} class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-40 transition">Next →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('audit-search')?.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { auditSearch = e.target.value; auditPage = 1; renderAuditLogs(); }
+    });
+
+  } catch (e) {
+    content.innerHTML = `<div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4">${escapeHtml(e.message)}</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Login form handler
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('login-btn');
+  const errDiv = document.getElementById('login-error');
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+
+  btn.disabled = true;
+  btn.textContent = 'Signing in...';
+  errDiv.classList.add('hidden');
+
+  try {
+    await doLogin(email, password);
+    showApp();
+  } catch (err) {
+    errDiv.textContent = err.message;
+    errDiv.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Sign In to Admin';
+  }
+});
+
+// Sidebar navigation
+document.querySelectorAll('.sidebar-link').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    navigateTo(link.dataset.page);
+  });
+});
+
+// Logout
+document.getElementById('logout-btn').addEventListener('click', () => {
+  if (confirm('Sign out of admin dashboard?')) doLogout();
+});
+
+// Auto-login check
+if (accessToken && currentUser) {
+  // Verify the token still works
+  api('/admin/dashboard/')
+    .then(() => showApp())
+    .catch(() => { doLogout(); showLogin(); });
+} else {
+  showLogin();
+}
+</script>
+</body>
+</html>
