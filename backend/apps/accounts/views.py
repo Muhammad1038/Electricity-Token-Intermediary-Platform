@@ -312,6 +312,93 @@ class LoginView(APIView):
         )
 
 
+class GoogleLoginView(APIView):
+    """
+    POST /api/v1/auth/google/
+    Accepts id_token from Google Sign-In, verifies it, creates user if they don't exist, and returns JWT access + refresh tokens.
+    """
+    permission_classes = [AllowAny]
+
+    @extend_schema(
+        tags=["auth"],
+        summary="Google Login — verify id_token and get JWT tokens",
+        description="Exchange a Google id_token from the mobile app for standard ETIP JWT tokens.",
+        request=inline_serializer(
+            name="GoogleLoginRequest",
+            fields={"id_token": drf_serializers.CharField(help_text="The ID token returned by Google SignIn on the mobile app")},
+        ),
+        responses={
+            200: OpenApiResponse(response=_JWT_RESPONSE, description="Login successful"),
+            400: OpenApiResponse(description="Invalid or missing Google token"),
+            403: OpenApiResponse(description="Account suspended"),
+        },
+    )
+    def post(self, request):
+        from google.oauth2 import id_token
+        from google.auth.transport import requests
+        from django.conf import settings
+        
+        token = request.data.get("id_token")
+        if not token:
+            return Response({"status": "error", "message": "id_token is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Verify the token with Google
+            client_id = settings.GOOGLE_OAUTH2_CLIENT_ID
+            idinfo = id_token.verify_oauth2_token(token, requests.Request(), client_id)
+
+            email = idinfo.get("email")
+            if not email:
+                return Response({"status": "error", "message": "Google account must have an email attached."}, status=status.HTTP_400_BAD_REQUEST)
+
+            first_name = idinfo.get("given_name", "")
+            last_name = idinfo.get("family_name", "")
+            full_name = f"{first_name} {last_name}".strip()
+
+            # Check if user exists, otherwise create them
+            user, created = User.objects.get_or_create(
+                email=email,
+                defaults={
+                    "full_name": full_name,
+                    "is_active": True,
+                    "is_verified": True, # Trusted via Google
+                }
+            )
+            
+            if created:
+                user.set_unusable_password()
+                user.save()
+            elif not user.is_active:
+                return Response(
+                    {"status": "error", "message": "This account has been suspended."},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+
+            # Generate your JWT tokens for the mobile app
+            refresh = RefreshToken.for_user(user)
+            logger.info("User Google login", extra={"user_id": str(user.id)})
+            
+            return Response(
+                {
+                    "status": "success",
+                    "message": "Login successful.",
+                    "data": {
+                        "access": str(refresh.access_token),
+                        "refresh": str(refresh),
+                        "user": UserProfileSerializer(user).data,
+                    },
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        except ValueError as e:
+            return Response({"status": "error", "message": f"Invalid or expired Google token: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            # Catching general exceptions (like google.auth.exceptions.GoogleAuthError) to prevent 500 crashes
+            return Response({"status": "error", "message": f"Invalid Google token format: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 class LogoutView(APIView):
     """
     POST /api/v1/auth/logout/

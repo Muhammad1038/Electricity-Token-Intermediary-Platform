@@ -1,0 +1,225 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.2, pytest-8.3.4, pluggy-1.6.0 -- C:\Users\muhammad\Electricity Token Internediary System\backend\venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.1.4, settings: config.settings.testing (from option)
+rootdir: C:\Users\muhammad\Electricity Token Internediary System\backend
+configfile: pytest.ini
+plugins: anyio-4.12.1, Faker-33.3.0, cov-6.0.0, django-4.9.0
+collecting ... collected 1 item
+
+.\venv\Scripts\pytest : 
+Creating test database for 
+alias 'default' ('file:memo
+rydb_default?mode=memory&ca
+che=shared')...
+At line:1 char:1
++ .\venv\Scripts\pytest .\a
+pps\accounts\tests\test_acc
+ounts.py::TestUse ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (Cre  
+  ating test d...che=sha   
+ red')...:String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+
+apps/accounts/tests/test_accounts.py::TestUserModel::test_create_user Operations to perform:
+  Synchronize unmigrated apps: corsheaders, django_filters, django_otp, drf_spectacular, messages, rest_framework, rest_framework_simplejwt, staticfiles
+  Apply all migrations: accounts, admin, admin_panel, auth, chat, contenttypes, django_celery_beat, django_celery_results, meters, otp_totp, sessions, token_blacklist, transactions
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying accounts.0001_initial... OK
+C:\Users\muhammad\Electrici
+ty Token Internediary Syste
+m\backend\venv\Lib\site-pac
+kages\pytest_cov\plugin.py:
+355: CovFailUnderWarning: 
+Coverage failure: total of 
+16 is less than 
+fail-under=80
+  warnings.warn(CovFailUnde
+rWarning(message), 
+stacklevel=1)
+  Applying accounts.0002_email_primary_whatsapp_number...ERROR
+ERROR: Coverage failure: total of 16 is less than fail-under=80
+
+
+=================================== ERRORS ====================================
+______________ ERROR at setup of TestUserModel.test_create_user _______________
+venv\Lib\site-packages\django\db\backends\utils.py:103: in _execute
+    return self.cursor.execute(sql)
+venv\Lib\site-packages\django\db\backends\sqlite3\base.py:350: in execute
+    return super().execute(query)
+E   sqlite3.OperationalError: unrecognized token: ":"
+
+The above exception was the direct cause of the following exception:
+venv\Lib\site-packages\pytest_django\plugin.py:533: in _django_db_marker
+    request.getfixturevalue("_django_db_helper")
+venv\Lib\site-packages\pytest_django\fixtures.py:144: in django_db_setup
+    db_cfg = setup_databases(
+venv\Lib\site-packages\django\test\utils.py:206: in setup_databases
+    connection.creation.create_test_db(
+venv\Lib\site-packages\django\db\backends\base\creation.py:78: in create_test_db
+    call_command(
+venv\Lib\site-packages\django\core\management\__init__.py:194: in call_command
+    return command.execute(*args, **defaults)
+venv\Lib\site-packages\django\core\management\base.py:459: in execute
+    output = self.handle(*args, **options)
+venv\Lib\site-packages\django\core\management\base.py:107: in wrapper
+    res = handle_func(*args, **kwargs)
+venv\Lib\site-packages\django\core\management\commands\migrate.py:357: in handle
+    post_migrate_state = executor.migrate(
+venv\Lib\site-packages\django\db\migrations\executor.py:135: in migrate
+    state = self._migrate_all_forwards(
+venv\Lib\site-packages\django\db\migrations\executor.py:167: in _migrate_all_forwards
+    state = self.apply_migration(
+venv\Lib\site-packages\django\db\migrations\executor.py:255: in apply_migration
+    state = migration.apply(state, schema_editor)
+venv\Lib\site-packages\django\db\migrations\migration.py:132: in apply
+    operation.database_forwards(
+venv\Lib\site-packages\django\db\migrations\operations\special.py:108: in database_forwards
+    self._run_sql(schema_editor, self.sql)
+venv\Lib\site-packages\django\db\migrations\operations\special.py:135: in _run_sql
+    schema_editor.execute(statement, params=None)
+venv\Lib\site-packages\django\db\backends\base\schema.py:202: in execute
+    cursor.execute(sql, params)
+venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+venv\Lib\site-packages\django\db\backends\utils.py:103: in _execute
+    return self.cursor.execute(sql)
+venv\Lib\site-packages\django\db\backends\sqlite3\base.py:350: in execute
+    return super().execute(query)
+E   django.db.utils.OperationalError: unrecognized token: ":"
+
+---------- coverage: platform win32, python 3.14.2-final-0 -----------
+Name                                                              Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------
+apps\__init__.py                                                      0      0   100%
+apps\accounts\__init__.py                                             0      0   100%
+apps\accounts\admin.py                                               19      0   100%
+apps\accounts\apps.py                                                 5      0   100%
+apps\accounts\migrations\0001_initial.py                              8      0   100%
+apps\accounts\migrations\0002_email_primary_whatsapp_number.py        4      0   100%
+apps\accounts\migrations\__init__.py                                  0      0   100%
+apps\accounts\models.py                                             101     30    70%   20-26, 29-32, 83, 88-90, 94-96, 99-102, 105-107, 141, 145, 149, 152, 170
+apps\accounts\serializers.py                                         92     92     0%   7-155
+apps\accounts\services.py                                            95     95     0%   11-278
+apps\accounts\tests\__init__.py                                       0      0   100%
+apps\accounts\tests\test_accounts.py                                 85     54    36%   21-27, 30-31, 34-39, 42-44, 47-52, 55-61, 67-69, 72-73, 76-77, 80-81, 91-98, 101-106, 109-117, 120-121, 124-125, 129-136
+apps\accounts\urls.py                                                 4      4     0%   4-19
+apps\accounts\views.py                                              144    144     0%   4-498
+apps\admin_panel\__init__.py                                          0      0   100%
+apps\admin_panel\admin.py                                            21      2    90%   32, 35
+apps\admin_panel\apps.py                                              5      0   100%
+apps\admin_panel\middleware.py                                       16     16     0%   5-30
+apps\admin_panel\migrations\0001_initial.py                           8      0   100%
+apps\admin_panel\migrations\__init__.py                               0      0   100%
+apps\admin_panel\models.py                                           57     14    75%   18-24, 59, 63, 66-67, 70-71, 117
+apps\admin_panel\serializers.py                                     108    108     0%   4-226
+apps\admin_panel\tests\__init__.py                                    0      0   100%
+apps\admin_panel\tests\test_admin_panel.py                           87     87     0%   4-141
+apps\admin_panel\urls.py                                              3      3     0%   4-24
+apps\admin_panel\views.py                                           281    281     0%   7-730
+apps\chat\__init__.py                                                 0      0   100%
+apps\chat\admin.py                                                   23      2    91%   19, 30
+apps\chat\apps.py                                                     5      0   100%
+apps\chat\knowledge.py                                                7      7     0%   7-99
+apps\chat\migrations\0001_initial.py                                  8      0   100%
+apps\chat\migrations\__init__.py                                      0      0   100%
+apps\chat\models.py                                                  30      3    90%   35, 60-61
+apps\chat\serializers.py                                              9      9     0%   1-13
+apps\chat\services.py                                               134    134     0%   13-379
+apps\chat\tests\__init__.py                                           0      0   100%
+apps\chat\tests\test_chat.py                                         55     55     0%   4-88
+apps\chat\urls.py                                                     3      3     0%   1-4
+apps\chat\views.py                                                   45     45     0%   4-100
+apps\meters\__init__.py                                               0      0   100%
+apps\meters\admin.py                                                 15      0   100%
+apps\meters\apps.py                                                   5      0   100%
+apps\meters\management\__init__.py                                    0      0   100%
+apps\meters\management\commands\__init__.py                           0      0   100%
+apps\meters\management\commands\purge_invalid_meters.py              76     76     0%   14-166
+apps\meters\migrations\0001_initial.py                                8      0   100%
+apps\meters\migrations\0002_add_ikedc_aba_disco_providers.py          4      0   100%
+apps\meters\migrations\0003_rename_kano_to_kedco.py                   4      0   100%
+apps\meters\migrations\0004_meterinquiry.py                           6      0   100%
+apps\meters\migrations\__init__.py                                    0      0   100%
+apps\meters\models.py                                                42      4    90%   73, 77-81
+apps\meters\models_inquiry.py                                        14      1    93%   21
+apps\meters\serializers.py                                           55     55     0%   4-124
+apps\meters\serializers_inquiry.py                                    7      7     0%   1-18
+apps\meters\services.py                                              70     70     0%   16-217
+apps\meters\tests\__init__.py                                         0      0   100%
+apps\meters\tests\test_meters.py                                     55     55     0%   4-115
+apps\meters\urls.py                                                   7      7     0%   4-14
+apps\meters\views.py                                                 42     42     0%   4-181
+apps\meters\views_inquiry.py                                         16     16     0%   1-20
+apps\notifications\__init__.py                                        0      0   100%
+apps\notifications\apps.py                                            5      0   100%
+apps\notifications\migrations\__init__.py                             0      0   100%
+apps\notifications\services.py                                       47     47     0%   12-100
+apps\notifications\tasks.py                                          25     25     0%   6-40
+apps\notifications\tests\__init__.py                                  0      0   100%
+apps\notifications\tests\test_notifications.py                       27     27     0%   4-41
+apps\payments\__init__.py                                             0      0   100%
+apps\payments\admin.py                                                0      0   100%
+apps\payments\apps.py                                                 5      0   100%
+apps\payments\migrations\__init__.py                                  0      0   100%
+apps\payments\serializers.py                                         19     19     0%   4-59
+apps\payments\services.py                                           127    127     0%   9-330
+apps\payments\tests\__init__.py                                       0      0   100%
+apps\payments\tests\test_payments.py                                 67     67     0%   4-142
+apps\payments\urls.py                                                 3      3     0%   4-8
+apps\payments\views.py                                               56     56     0%   4-200
+apps\payments\webhook_urls.py                                         3      3     0%   4-8
+apps\transactions\__init__.py                                         0      0   100%
+apps\transactions\admin.py                                           10      0   100%
+apps\transactions\apps.py                                             5      0   100%
+apps\transactions\management\__init__.py                              0      0   100%
+apps\transactions\management\commands\__init__.py                     0      0   100%
+apps\transactions\management\commands\deliver_pending_tokens.py      29     29     0%   9-67
+apps\transactions\migrations\0001_initial.py                          8      0   100%
+apps\transactions\migrations\__init__.py                              0      0   100%
+apps\transactions\models.py                                          57      3    95%   116, 120, 124
+apps\transactions\serializers.py                                     45     45     0%   4-158
+apps\transactions\services.py                                        83     83     0%   4-220
+apps\transactions\tasks.py                                          163    163     0%   7-431
+apps\transactions\tests\__init__.py                                   0      0   100%
+apps\transactions\tests\test_transactions.py                         91     91     0%   4-163
+apps\transactions\urls.py                                             3      3     0%   4-8
+apps\transactions\views.py                                           49     49     0%   4-150
+-----------------------------------------------------------------------------------------------
+TOTAL                                                              2815   2361    16%
+Coverage HTML written to dir htmlcov
+
+FAIL Required test coverage of 80% not reached. Total coverage: 16.13%
+=========================== short test summary info ===========================
+ERROR apps/accounts/tests/test_accounts.py::TestUserModel::test_create_user - django.db.utils.OperationalError: unrecognized token: ":"
+============================== 1 error in 3.79s ===============================

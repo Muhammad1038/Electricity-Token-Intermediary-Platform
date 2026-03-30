@@ -102,6 +102,21 @@ def _request_token_from_disco(
     secret_key = getattr(settings, "VTPASS_SECRET_KEY", "")
     base_url   = getattr(settings, "VTPASS_BASE_URL",   "https://vtpass.com/api")
 
+    # ── Test-mode stub: instant token without contacting VTPass ──────────────
+    if getattr(settings, "VTPASS_TEST_MODE", False):
+        import random, string
+        fake_token = "".join(random.choices(string.digits, k=20))
+        logger.info(
+            "[TEST MODE] Returning instant stub token for %s / %s",
+            disco, reference,
+        )
+        return {
+            "success": True,
+            "token": fake_token,
+            "disco_reference": f"TEST-{reference}",
+            "units": str(round(float(amount) / 75, 1)),  # rough kWh estimate
+        }
+    # ─────────────────────────────────────────────────────────────────────────
     disco_apis = getattr(settings, "DISCO_APIS", {})
     service_id = disco_apis.get(disco, {}).get("vtpass_service_id", "")
 

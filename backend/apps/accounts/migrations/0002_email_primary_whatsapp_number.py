@@ -12,6 +12,13 @@ removing the NOT NULL constraint — safe for dev/test environments.
 from django.db import migrations, models
 
 
+def set_placeholder_emails(apps, schema_editor):
+    User = apps.get_model("accounts", "User")
+    import uuid
+    for user in User.objects.filter(email__isnull=True):
+        user.email = f"legacy_{uuid.uuid4().hex}@placeholder.invalid"
+        user.save(update_fields=["email"])
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -20,14 +27,10 @@ class Migration(migrations.Migration):
 
     operations = [
         # 1. Assign a placeholder email to any rows that currently have NULL email
-        #    (only relevant if dev DB already has data).
-        migrations.RunSQL(
-            sql="""
-                UPDATE users
-                SET email = 'legacy_' || gen_random_uuid()::text || '@placeholder.invalid'
-                WHERE email IS NULL;
-            """,
-            reverse_sql=migrations.RunSQL.noop,
+        #    (Works on both Postgres and SQLite)
+        migrations.RunPython(
+            code=set_placeholder_emails,
+            reverse_code=migrations.RunPython.noop,
         ),
 
         # 2. Make email non-nullable + required

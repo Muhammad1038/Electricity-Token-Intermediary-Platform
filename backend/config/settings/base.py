@@ -6,8 +6,15 @@ Shared across all environments.
 import os
 from datetime import timedelta
 from pathlib import Path
+import smtplib
+import socket
 
 import environ
+import mimetypes
+
+# Fix for Windows strictly MIME type CSS bugs in development
+mimetypes.add_type("text/css", ".css", True)
+mimetypes.add_type("application/javascript", ".js", True)
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # /backend
@@ -54,6 +61,7 @@ LOCAL_APPS = [
     "apps.payments",
     "apps.notifications",
     "apps.admin_panel",
+    "apps.chat",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -247,11 +255,22 @@ SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = "DENY"
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
+import socket
+
+# Monkeypatch getaddrinfo to force IPv4 for Gmail SMTP (bypasses WinError 10060 IPv6 drop bug)
+# while preserving the 'smtp.gmail.com' hostname so SSL validtion succeeds.
+_builtin_getaddrinfo = socket.getaddrinfo
+
+def _ipv4_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+    if host == "smtp.gmail.com":
+        family = socket.AF_INET
+    return _builtin_getaddrinfo(host, port, family, type, proto, flags)
+
+socket.getaddrinfo = _ipv4_getaddrinfo
+
 # ── Email (SMTP) — OTP delivery ───────────────────────────────────────────────
-# OTP codes are emailed directly via Django SMTP.
-# Gmail: enable 2FA → Google Account → Security → App Passwords → create one.
-# The 16-char App Password goes in EMAIL_HOST_PASSWORD (NOT your Gmail password).
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
 EMAIL_HOST          = env("EMAIL_HOST",          default="smtp.gmail.com")
 EMAIL_PORT          = env.int("EMAIL_PORT",      default=587)
 EMAIL_USE_TLS       = env.bool("EMAIL_USE_TLS",  default=True)
@@ -312,6 +331,8 @@ VTPASS_API_KEY    = env("VTPASS_API_KEY",    default="")
 VTPASS_PUBLIC_KEY = env("VTPASS_PUBLIC_KEY", default="")
 VTPASS_SECRET_KEY = env("VTPASS_SECRET_KEY", default="")
 VTPASS_BASE_URL   = env("VTPASS_BASE_URL",   default="https://sandbox.vtpass.com/api")
+# Set to True to skip real VTPass calls and return instant test tokens (sandbox testing)
+VTPASS_TEST_MODE  = env.bool("VTPASS_TEST_MODE", default=False)
 
 # DISCO registry — keyed by DISCOProvider code.
 # 'vtpass_service_id' maps to the serviceID field in every VTPass electricity request.
@@ -387,8 +408,6 @@ DISCO_APIS = {
 
 # ── Twilio ─────────────────────────────────────────────────────────────────────
 # Register at: https://www.twilio.com/try-twilio
-# ── Twilio ───────────────────────────────────────────────────────────────────
-# Register at: https://www.twilio.com/try-twilio
 # Console:     https://www.twilio.com/console
 # Verify docs: https://www.twilio.com/docs/verify/api
 #
@@ -420,3 +439,12 @@ FIREBASE_CREDENTIALS_PATH = env(
 # Frontend
 FRONTEND_URL = env("FRONTEND_URL", default="http://localhost:3000")
 ADMIN_FRONTEND_URL = env("ADMIN_FRONTEND_URL", default="http://localhost:3001")
+
+# ── AI Chat Assistant (Google Gemini — FREE) ─────────────────────────────────
+GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
+CHAT_MODEL = env("CHAT_MODEL", default="gemini-2.0-flash")
+CHAT_MAX_CONTEXT_MESSAGES = env.int("CHAT_MAX_CONTEXT_MESSAGES", default=20)
+CHAT_ENABLED = env.bool("CHAT_ENABLED", default=True)
+
+# Google OAuth
+GOOGLE_OAUTH2_CLIENT_ID = env('GOOGLE_OAUTH2_CLIENT_ID', default='987603974781-lmm5s64speiv6dn2j566mhsnvube6ifo.apps.googleusercontent.com')

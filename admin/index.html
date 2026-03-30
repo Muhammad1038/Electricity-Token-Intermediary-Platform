@@ -136,7 +136,7 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // Auto-detect backend: same hostname as the browser, port 8000
-const API_BASE = `http://${window.location.hostname}:8000/api/v1`;
+const host = window.location.hostname || "127.0.0.1"; const API_BASE = `http://${host}:8000/api/v1`;
 
 // ── State ────────────────────────────────────────────────────────────────────
 let accessToken = localStorage.getItem('admin_access_token') || '';

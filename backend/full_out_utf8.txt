@@ -1,0 +1,308 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.2, pytest-8.3.4, pluggy-1.6.0 -- C:\Users\muhammad\Electricity Token Internediary System\backend\venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.1.4, settings: config.settings.testing (from option)
+rootdir: C:\Users\muhammad\Electricity Token Internediary System\backend
+configfile: pytest.ini
+plugins: anyio-4.12.1, Faker-33.3.0, cov-6.0.0, django-4.9.0
+collecting ... collected 78 items
+
+apps/accounts/tests/test_accounts.py::TestUserModel::test_create_user PASSED [  1%]
+apps/accounts/tests/test_accounts.py::TestUserModel::test_create_user_no_email_raises PASSED [  2%]
+apps/accounts/tests/test_accounts.py::TestUserModel::test_create_superuser PASSED [  3%]
+apps/accounts/tests/test_accounts.py::TestUserModel::test_email_always_lowercase PASSED [  5%]
+apps/accounts/tests/test_accounts.py::TestUserModel::test_account_lockout_after_5_failures PASSED [  6%]
+apps/accounts/tests/test_accounts.py::TestUserModel::test_reset_failed_login PASSED [  7%]
+apps/accounts/tests/test_accounts.py::TestOTPModel::test_generate_code_is_6_digits PASSED [  8%]
+apps/accounts/tests/test_accounts.py::TestOTPModel::test_otp_is_expired PASSED [ 10%]
+apps/accounts/tests/test_accounts.py::TestOTPModel::test_otp_is_valid PASSED [ 11%]
+apps/accounts/tests/test_accounts.py::TestOTPModel::test_otp_invalid_when_used PASSED [ 12%]
+apps/accounts/tests/test_accounts.py::TestAuthViews::test_register_sends_otp PASSED [ 14%]
+apps/accounts/tests/test_accounts.py::TestAuthViews::test_login_wrong_password PASSED [ 15%]
+apps/accounts/tests/test_accounts.py::TestAuthViews::test_login_success PASSED [ 16%]
+apps/accounts/tests/test_accounts.py::TestAuthViews::test_profile_authenticated PASSED [ 17%]
+apps/accounts/tests/test_accounts.py::TestAuthViews::test_profile_unauthenticated PASSED [ 19%]
+apps/accounts/tests/test_accounts.py::TestAuthViews::test_password_reset_request PASSED [ 20%]
+apps/admin_panel/tests/test_admin_panel.py::TestDashboardViews::test_dashboard_stats PASSED [ 21%]
+apps/admin_panel/tests/test_admin_panel.py::TestDashboardViews::test_dashboard_requires_staff PASSED [ 23%]
+apps/admin_panel/tests/test_admin_panel.py::TestCustomerManagement::test_customer_list PASSED [ 24%]
+apps/admin_panel/tests/test_admin_panel.py::TestCustomerManagement::test_customer_list_with_search PASSED [ 25%]
+apps/admin_panel/tests/test_admin_panel.py::TestCustomerManagement::test_customer_detail PASSED [ 26%]
+apps/admin_panel/tests/test_admin_panel.py::TestCustomerManagement::test_suspend_customer PASSED [ 28%]
+apps/admin_panel/tests/test_admin_panel.py::TestCustomerManagement::test_reactivate_customer PASSED [ 29%]
+apps/admin_panel/tests/test_admin_panel.py::TestTransactionManagement::test_admin_transaction_list PASSED [ 30%]
+apps/admin_panel/tests/test_admin_panel.py::TestTransactionManagement::test_resolve_transaction PASSED [ 32%]
+apps/admin_panel/tests/test_admin_panel.py::TestAuditLog::test_audit_log_no_delete_permission PASSED [ 33%]
+apps/admin_panel/tests/test_admin_panel.py::TestAuditLog::test_audit_log_list PASSED [ 34%]
+apps/chat/tests/test_chat.py::TestChatModels::test_conversation_one_per_user PASSED [ 35%]
+apps/chat/tests/test_chat.py::TestChatModels::test_message_ordering PASSED [ 37%]
+apps/chat/tests/test_chat.py::TestChatViews::test_send_message PASSED    [ 38%]
+apps/chat/tests/test_chat.py::TestChatViews::test_chat_history PASSED    [ 39%]
+apps/chat/tests/test_chat.py::TestChatViews::test_clear_chat PASSED      [ 41%]
+apps/chat/tests/test_chat.py::TestChatViews::test_send_message_unauthenticated PASSED [ 42%]
+apps/meters/tests/test_meters.py::TestMeterProfileModel::test_meter_creation PASSED [ 43%]
+apps/meters/tests/test_meters.py::TestMeterProfileModel::test_default_meter_auto_unset PASSED [ 44%]
+apps/meters/tests/test_meters.py::TestMeterViews::test_list_meters_authenticated PASSED [ 46%]
+apps/meters/tests/test_meters.py::TestMeterViews::test_list_meters_unauthenticated PASSED [ 47%]
+apps/meters/tests/test_meters.py::TestMeterViews::test_add_meter FAILED  [ 48%]
+apps/meters/tests/test_meters.py::TestMeterViews::test_add_duplicate_meter FAILED [ 50%]
+apps/meters/tests/test_meters.py::TestMeterViews::test_retrieve_meter PASSED [ 51%]
+apps/meters/tests/test_meters.py::TestMeterViews::test_soft_delete_meter PASSED [ 52%]
+apps/meters/tests/test_meters.py::TestMeterViews::test_validate_endpoint FAILED [ 53%]
+apps/meters/tests/test_meters.py::TestMeterViews::test_validate_endpoint_empty_body PASSED [ 55%]
+apps/notifications/tests/test_notifications.py::TestNotificationServices::test_send_whatsapp_not_configured PASSED [ 56%]
+apps/notifications/tests/test_notifications.py::TestNotificationServices::test_send_push_no_firebase PASSED [ 57%]
+apps/notifications/tests/test_notifications.py::TestNotificationTasks::test_sms_task_skips_unconfigured PASSED [ 58%]
+apps/notifications/tests/test_notifications.py::TestNotificationTasks::test_push_task_skips_unconfigured PASSED [ 60%]
+apps/payments/tests/test_payments.py::TestPaymentServices::test_initiate_payment_success PASSED [ 61%]
+apps/payments/tests/test_payments.py::TestPaymentServices::test_initiate_payment_invalid_meter PASSED [ 62%]
+apps/payments/tests/test_payments.py::TestPaymentServices::test_initiate_payment_unauthenticated PASSED [ 64%]
+apps/payments/tests/test_payments.py::TestPaymentServices::test_initiate_payment_empty_body PASSED [ 65%]
+apps/payments/tests/test_payments.py::TestPaymentServices::test_verify_payment_success PASSED [ 66%]
+apps/payments/tests/test_payments.py::TestPaymentServices::test_verify_payment_failed PASSED [ 67%]
+apps/payments/tests/test_payments.py::TestPaymentServices::test_verify_payment_no_reference PASSED [ 69%]
+apps/payments/tests/test_payments.py::TestPaystackWebhook::test_webhook_invalid_signature PASSED [ 70%]
+apps/payments/tests/test_payments.py::TestPaystackWebhook::test_webhook_valid_signature PASSED [ 71%]
+apps/transactions/tests/test_transactions.py::TestTransactionServices::test_generate_reference_format PASSED [ 73%]
+apps/transactions/tests/test_transactions.py::TestTransactionServices::test_generate_reference_unique PASSED [ 74%]
+apps/transactions/tests/test_transactions.py::TestTransactionServices::test_create_transaction PASSED [ 75%]
+apps/transactions/tests/test_transactions.py::TestTransactionServices::test_confirm_payment PASSED [ 76%]
+apps/transactions/tests/test_transactions.py::TestTransactionServices::test_fail_payment PASSED [ 78%]
+apps/transactions/tests/test_transactions.py::TestTransactionServices::test_encrypt_decrypt_token_roundtrip PASSED [ 79%]
+apps/transactions/tests/test_transactions.py::TestTransactionServices::test_store_token PASSED [ 80%]
+apps/transactions/tests/test_transactions.py::TestTransactionServices::test_fail_token PASSED [ 82%]
+apps/transactions/tests/test_transactions.py::TestTransactionModel::test_total_amount PASSED [ 83%]
+apps/transactions/tests/test_transactions.py::TestTransactionModel::test_can_resend_token_eligible PASSED [ 84%]
+apps/transactions/tests/test_transactions.py::TestTransactionModel::test_can_resend_token_max_attempts PASSED [ 85%]
+apps/transactions/tests/test_transactions.py::TestTransactionModel::test_can_resend_token_not_paid PASSED [ 87%]
+apps/transactions/tests/test_transactions.py::TestTransactionViews::test_list_transactions PASSED [ 88%]
+apps/transactions/tests/test_transactions.py::TestTransactionViews::test_list_transactions_unauthenticated PASSED [ 89%]
+apps/transactions/tests/test_transactions.py::TestTransactionViews::test_transaction_detail PASSED [ 91%]
+apps/transactions/tests/test_transactions.py::TestTransactionViews::test_transaction_detail_not_found PASSED [ 92%]
+apps/transactions/tests/test_transactions.py::TestTransactionViews::test_resend_token_unpaid PASSED [ 93%]
+apps/transactions/tests/test_transactions.py::TestTransactionViews::test_resend_token_eligible FAILED [ 94%]
+apps/admin_panel/tests/test_admin_panel.py::TestAuditLogMiddleware::test_middleware_attaches_ip PASSED [ 96%]
+apps/admin_panel/tests/test_admin_panel.py::TestAuditLogMiddleware::test_middleware_x_forwarded_for PASSED [ 97%]
+apps/chat/tests/test_chat.py::TestKnowledge::test_faq_not_empty PASSED   [ 98%]
+.\venv\Scripts\pytest : C:\
+Users\muhammad\Electricity 
+Token Internediary System\b
+ackend\venv\Lib\site-packag
+es\pytest_cov\plugin.py:355
+: CovFailUnderWarning: 
+Coverage failure: total of 
+67 is less than 
+fail-under=80
+At line:1 char:1
++ .\venv\Scripts\pytest 
+apps -v --tb=short --ds=con
+fig.settings.testing ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (C:\  
+  Users\muhamm...n fail-   
+ under=80:String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+  warnings.warn(CovFailUnde
+rWarning(message), 
+stacklevel=1)
+apps/chat/tests/test_chat.py::TestKnowledge::test_build_faq_section PASSED [100%]
+ERROR: Coverage failure: total of 67 is less than fail-under=80
+
+
+================================== FAILURES ===================================
+________________________ TestMeterViews.test_add_meter ________________________
+..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\unittest\mock.py:1429: in patched
+    with self.decoration_helper(patched,
+..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\unittest\mock.py:1411: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\contextlib.py:530: in enter_context
+    result = _enter(cm)
+..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\unittest\mock.py:1503: in __enter__
+    original, local = self.get_original()
+..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\unittest\mock.py:1473: in get_original
+    raise AttributeError(
+E   AttributeError: <module 'apps.meters.serializers' from 'C:\\Users\\muhammad\\Electricity Token Internediary System\\backend\\apps\\meters\\serializers.py'> does not have the attribute 'validate_meter_with_disco'
+___________________ TestMeterViews.test_add_duplicate_meter ___________________
+..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\unittest\mock.py:1429: in patched
+    with self.decoration_helper(patched,
+..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\unittest\mock.py:1411: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\contextlib.py:530: in enter_context
+    result = _enter(cm)
+..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\unittest\mock.py:1503: in __enter__
+    original, local = self.get_original()
+..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\unittest\mock.py:1473: in get_original
+    raise AttributeError(
+E   AttributeError: <module 'apps.meters.serializers' from 'C:\\Users\\muhammad\\Electricity Token Internediary System\\backend\\apps\\meters\\serializers.py'> does not have the attribute 'validate_meter_with_disco'
+____________________ TestMeterViews.test_validate_endpoint ____________________
+apps\meters\tests\test_meters.py:107: in test_validate_endpoint
+    assert resp.status_code == 200
+E   assert 422 == 200
+E    +  where 422 = <Response status_code=422, "application/json">.status_code
+_______________ TestTransactionViews.test_resend_token_eligible _______________
+apps\transactions\tests\test_transactions.py:159: in test_resend_token_eligible
+    resp = auth_client.post(
+venv\Lib\site-packages\rest_framework\test.py:295: in post
+    response = super().post(
+venv\Lib\site-packages\rest_framework\test.py:209: in post
+    return self.generic('POST', path, data, content_type, **extra)
+venv\Lib\site-packages\rest_framework\test.py:233: in generic
+    return super().generic(
+venv\Lib\site-packages\django\test\client.py:676: in generic
+    return self.request(**r)
+venv\Lib\site-packages\rest_framework\test.py:285: in request
+    return super().request(**kwargs)
+venv\Lib\site-packages\rest_framework\test.py:237: in request
+    request = super().request(**kwargs)
+venv\Lib\site-packages\django\test\client.py:1092: in request
+    self.check_exception(response)
+venv\Lib\site-packages\django\test\client.py:805: in check_exception
+    raise exc_value
+venv\Lib\site-packages\django\core\handlers\exception.py:55: in inner
+    response = get_response(request)
+venv\Lib\site-packages\django\core\handlers\base.py:197: in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+venv\Lib\site-packages\django\views\decorators\csrf.py:65: in _view_wrapper
+    return view_func(request, *args, **kwargs)
+venv\Lib\site-packages\django\views\generic\base.py:104: in view
+    return self.dispatch(request, *args, **kwargs)
+venv\Lib\site-packages\rest_framework\views.py:509: in dispatch
+    response = self.handle_exception(exc)
+venv\Lib\site-packages\rest_framework\views.py:469: in handle_exception
+    self.raise_uncaught_exception(exc)
+venv\Lib\site-packages\rest_framework\views.py:480: in raise_uncaught_exception
+    raise exc
+venv\Lib\site-packages\rest_framework\views.py:506: in dispatch
+    response = handler(request, *args, **kwargs)
+apps\transactions\views.py:144: in post
+    if not result["success"]:
+E   TypeError: 'bool' object is not subscriptable
+------------------------------ Captured log call ------------------------------
+ERROR    config.exceptions:exceptions.py:41 Unhandled exception in API view
+Traceback (most recent call last):
+  File "C:\Users\muhammad\Electricity Token Internediary System\backend\venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\muhammad\Electricity Token Internediary System\backend\apps\transactions\views.py", line 144, in post
+    if not result["success"]:
+           ~~~~~~^^^^^^^^^^^
+TypeError: 'bool' object is not subscriptable
+
+---------- coverage: platform win32, python 3.14.2-final-0 -----------
+Name                                                              Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------
+apps\__init__.py                                                      0      0   100%
+apps\accounts\__init__.py                                             0      0   100%
+apps\accounts\admin.py                                               19      0   100%
+apps\accounts\apps.py                                                 5      0   100%
+apps\accounts\migrations\0001_initial.py                              8      0   100%
+apps\accounts\migrations\0002_email_primary_whatsapp_number.py       10      2    80%   19-20
+apps\accounts\migrations\__init__.py                                  0      0   100%
+apps\accounts\models.py                                             101      2    98%   152, 170
+apps\accounts\serializers.py                                         92     36    61%   18-24, 29-36, 52, 56-58, 70, 73-75, 78, 86, 112, 115, 124, 139-143, 146-155
+apps\accounts\services.py                                            95     77    19%   38-53, 62-85, 96-120, 132-140, 152-154, 164-175, 188-195, 205-230, 238-259, 278
+apps\accounts\tests\__init__.py                                       0      0   100%
+apps\accounts\tests\test_accounts.py                                 85      0   100%
+apps\accounts\urls.py                                                 4      0   100%
+apps\accounts\views.py                                              144     63    56%   136-163, 195-216, 271-272, 278, 284, 337-353, 408-424, 458-463, 486-498
+apps\admin_panel\__init__.py                                          0      0   100%
+apps\admin_panel\admin.py                                            21      2    90%   32, 35
+apps\admin_panel\apps.py                                              5      0   100%
+apps\admin_panel\middleware.py                                       16      0   100%
+apps\admin_panel\migrations\0001_initial.py                           8      0   100%
+apps\admin_panel\migrations\__init__.py                               0      0   100%
+apps\admin_panel\models.py                                           57     14    75%   18-24, 59, 63, 66-67, 70-71, 117
+apps\admin_panel\serializers.py                                     108     17    84%   41-45, 88-90, 138-139, 176-178, 182-185
+apps\admin_panel\tests\__init__.py                                    0      0   100%
+apps\admin_panel\tests\test_admin_panel.py                           87      0   100%
+apps\admin_panel\urls.py                                              3      0   100%
+apps\admin_panel\views.py                                           281    121    57%   120-147, 160-202, 213-225, 243, 279, 285-286, 305-331, 354, 358-359, 401-427, 452, 459, 464, 468, 472, 476, 504-517, 540, 544-545, 594-627, 652, 658, 662, 690-696, 716-730
+apps\chat\__init__.py                                                 0      0   100%
+apps\chat\admin.py                                                   23      2    91%   19, 30
+apps\chat\apps.py                                                     5      0   100%
+apps\chat\knowledge.py                                                7      0   100%
+apps\chat\migrations\0001_initial.py                                  8      0   100%
+apps\chat\migrations\__init__.py                                      0      0   100%
+apps\chat\models.py                                                  30      2    93%   60-61
+apps\chat\serializers.py                                              9      0   100%
+apps\chat\services.py                                               134    111    17%   150-153, 163-236, 245-262, 268-284, 288-295, 298-302, 309-331, 334-338, 347-369, 379
+apps\chat\tests\__init__.py                                           0      0   100%
+apps\chat\tests\test_chat.py                                         55      0   100%
+apps\chat\urls.py                                                     3      0   100%
+apps\chat\views.py                                                   45      4    91%   46-48, 84
+apps\meters\__init__.py                                               0      0   100%
+apps\meters\admin.py                                                 15      0   100%
+apps\meters\apps.py                                                   5      0   100%
+apps\meters\management\__init__.py                                    0      0   100%
+apps\meters\management\commands\__init__.py                           0      0   100%
+apps\meters\management\commands\purge_invalid_meters.py              76     76     0%   14-166
+apps\meters\migrations\0001_initial.py                                8      0   100%
+apps\meters\migrations\0002_add_ikedc_aba_disco_providers.py          4      0   100%
+apps\meters\migrations\0003_rename_kano_to_kedco.py                   4      0   100%
+apps\meters\migrations\0004_meterinquiry.py                           6      0   100%
+apps\meters\migrations\__init__.py                                    0      0   100%
+apps\meters\models.py                                                42      1    98%   73
+apps\meters\models_inquiry.py                                        14      1    93%   21
+apps\meters\serializers.py                                           55     33    40%   61-84, 87-124
+apps\meters\serializers_inquiry.py                                    7      0   100%
+apps\meters\services.py                                              70     25    64%   77, 81, 108-112, 123-149, 185-186, 195-196, 202-217
+apps\meters\tests\__init__.py                                         0      0   100%
+apps\meters\tests\test_meters.py                                     55      7    87%   48-61, 65-77
+apps\meters\urls.py                                                   7      0   100%
+apps\meters\views.py                                                 42      7    83%   108-111, 170-181
+apps\meters\views_inquiry.py                                         16      5    69%   14-17, 20
+apps\notifications\__init__.py                                        0      0   100%
+apps\notifications\apps.py                                            5      0   100%
+apps\notifications\migrations\__init__.py                             0      0   100%
+apps\notifications\services.py                                       47     29    38%   41-62, 82-100
+apps\notifications\tasks.py                                          25      6    76%   23-25, 38-40
+apps\notifications\tests\__init__.py                                  0      0   100%
+apps\notifications\tests\test_notifications.py                       27      0   100%
+apps\payments\__init__.py                                             0      0   100%
+apps\payments\admin.py                                                0      0   100%
+apps\payments\apps.py                                                 5      0   100%
+apps\payments\migrations\__init__.py                                  0      0   100%
+apps\payments\serializers.py                                         19      2    89%   32, 36
+apps\payments\services.py                                           127     60    53%   66, 80-88, 96-138, 147-165, 197, 206-208, 239-242, 256-257, 261, 290-308, 322-323, 328
+apps\payments\tests\__init__.py                                       0      0   100%
+apps\payments\tests\test_payments.py                                 67      0   100%
+apps\payments\urls.py                                                 3      0   100%
+apps\payments\views.py                                               56      7    88%   141-148, 192-193
+apps\payments\webhook_urls.py                                         3      0   100%
+apps\transactions\__init__.py                                         0      0   100%
+apps\transactions\admin.py                                           10      0   100%
+apps\transactions\apps.py                                             5      0   100%
+apps\transactions\management\__init__.py                              0      0   100%
+apps\transactions\management\commands\__init__.py                     0      0   100%
+apps\transactions\management\commands\deliver_pending_tokens.py      29     29     0%   9-67
+apps\transactions\migrations\0001_initial.py                          8      0   100%
+apps\transactions\migrations\__init__.py                              0      0   100%
+apps\transactions\models.py                                          57      1    98%   116
+apps\transactions\serializers.py                                     45      6    87%   89-90, 130-135
+apps\transactions\services.py                                        83     18    78%   24, 37-39, 162-182, 205
+apps\transactions\tasks.py                                          163    148     9%   31-50, 61-77, 101-190, 200-256, 268-335, 340-386, 391-431
+apps\transactions\tests\__init__.py                                   0      0   100%
+apps\transactions\tests\test_transactions.py                         91      1    99%   163
+apps\transactions\urls.py                                             3      0   100%
+apps\transactions\views.py                                           49      7    86%   95-99, 137, 150
+-----------------------------------------------------------------------------------------------
+TOTAL                                                              2821    922    67%
+Coverage HTML written to dir htmlcov
+
+FAIL Required test coverage of 80% not reached. Total coverage: 67.32%
+=========================== short test summary info ===========================
+FAILED apps/meters/tests/test_meters.py::TestMeterViews::test_add_meter - AttributeError: <module 'apps.meters.serializers' from 'C:\\Users\\muhammad\\Electricity Token Internediary System\\backend\\apps\\meters\\serializers.py'> does not have the attribute 'validate_meter_with_disco'
+FAILED apps/meters/tests/test_meters.py::TestMeterViews::test_add_duplicate_meter - AttributeError: <module 'apps.meters.serializers' from 'C:\\Users\\muhammad\\Electricity Token Internediary System\\backend\\apps\\meters\\serializers.py'> does not have the attribute 'validate_meter_with_disco'
+FAILED apps/meters/tests/test_meters.py::TestMeterViews::test_validate_endpoint - assert 422 == 200
+ +  where 422 = <Response status_code=422, "application/json">.status_code
+FAILED apps/transactions/tests/test_transactions.py::TestTransactionViews::test_resend_token_eligible - TypeError: 'bool' object is not subscriptable
+======================== 4 failed, 74 passed in 20.88s ========================

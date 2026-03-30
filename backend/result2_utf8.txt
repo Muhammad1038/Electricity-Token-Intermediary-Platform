@@ -1,0 +1,269 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.2, pytest-8.3.4, pluggy-1.6.0 -- C:\Users\muhammad\Electricity Token Internediary System\backend\venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.1.4, settings: config.settings.testing (from option)
+rootdir: C:\Users\muhammad\Electricity Token Internediary System\backend
+configfile: pytest.ini
+plugins: anyio-4.12.1, Faker-33.3.0, cov-6.0.0, django-4.9.0
+collecting ... collected 83 items
+
+apps/accounts/tests/test_accounts.py::TestUserModel::test_create_user PASSED [  1%]
+apps/accounts/tests/test_accounts.py::TestUserModel::test_create_user_no_email_raises PASSED [  2%]
+apps/accounts/tests/test_accounts.py::TestUserModel::test_create_superuser PASSED [  3%]
+apps/accounts/tests/test_accounts.py::TestUserModel::test_email_always_lowercase PASSED [  4%]
+apps/accounts/tests/test_accounts.py::TestUserModel::test_account_lockout_after_5_failures PASSED [  6%]
+apps/accounts/tests/test_accounts.py::TestUserModel::test_reset_failed_login PASSED [  7%]
+apps/accounts/tests/test_accounts.py::TestOTPModel::test_generate_code_is_6_digits PASSED [  8%]
+apps/accounts/tests/test_accounts.py::TestOTPModel::test_otp_is_expired PASSED [  9%]
+apps/accounts/tests/test_accounts.py::TestOTPModel::test_otp_is_valid PASSED [ 10%]
+apps/accounts/tests/test_accounts.py::TestOTPModel::test_otp_invalid_when_used PASSED [ 12%]
+apps/accounts/tests/test_accounts.py::TestAuthViews::test_register_sends_otp PASSED [ 13%]
+apps/accounts/tests/test_accounts.py::TestAuthViews::test_login_wrong_password PASSED [ 14%]
+apps/accounts/tests/test_accounts.py::TestAuthViews::test_login_success PASSED [ 15%]
+apps/accounts/tests/test_accounts.py::TestAuthViews::test_profile_authenticated PASSED [ 16%]
+apps/accounts/tests/test_accounts.py::TestAuthViews::test_profile_unauthenticated PASSED [ 18%]
+apps/accounts/tests/test_accounts.py::TestAuthViews::test_password_reset_request PASSED [ 19%]
+apps/admin_panel/tests/test_admin_panel.py::TestDashboardViews::test_dashboard_stats PASSED [ 20%]
+apps/admin_panel/tests/test_admin_panel.py::TestDashboardViews::test_dashboard_requires_staff PASSED [ 21%]
+apps/admin_panel/tests/test_admin_panel.py::TestCustomerManagement::test_customer_list PASSED [ 22%]
+apps/admin_panel/tests/test_admin_panel.py::TestCustomerManagement::test_customer_list_with_search PASSED [ 24%]
+apps/admin_panel/tests/test_admin_panel.py::TestCustomerManagement::test_customer_detail PASSED [ 25%]
+apps/admin_panel/tests/test_admin_panel.py::TestCustomerManagement::test_suspend_customer PASSED [ 26%]
+apps/admin_panel/tests/test_admin_panel.py::TestCustomerManagement::test_reactivate_customer PASSED [ 27%]
+apps/admin_panel/tests/test_admin_panel.py::TestTransactionManagement::test_admin_transaction_list PASSED [ 28%]
+apps/admin_panel/tests/test_admin_panel.py::TestTransactionManagement::test_resolve_transaction PASSED [ 30%]
+apps/admin_panel/tests/test_admin_panel.py::TestAuditLog::test_audit_log_no_delete_permission PASSED [ 31%]
+apps/admin_panel/tests/test_admin_panel.py::TestAuditLog::test_audit_log_list PASSED [ 32%]
+apps/chat/tests/test_chat.py::TestChatModels::test_conversation_one_per_user PASSED [ 33%]
+apps/chat/tests/test_chat.py::TestChatModels::test_message_ordering PASSED [ 34%]
+apps/chat/tests/test_chat.py::TestChatViews::test_send_message PASSED    [ 36%]
+apps/chat/tests/test_chat.py::TestChatViews::test_chat_history PASSED    [ 37%]
+apps/chat/tests/test_chat.py::TestChatViews::test_clear_chat PASSED      [ 38%]
+apps/chat/tests/test_chat.py::TestChatViews::test_send_message_unauthenticated PASSED [ 39%]
+apps/meters/tests/test_meters.py::TestMeterProfileModel::test_meter_creation PASSED [ 40%]
+apps/meters/tests/test_meters.py::TestMeterProfileModel::test_default_meter_auto_unset PASSED [ 42%]
+apps/meters/tests/test_meters.py::TestMeterViews::test_list_meters_authenticated PASSED [ 43%]
+apps/meters/tests/test_meters.py::TestMeterViews::test_list_meters_unauthenticated PASSED [ 44%]
+apps/meters/tests/test_meters.py::TestMeterViews::test_add_meter PASSED  [ 45%]
+apps/meters/tests/test_meters.py::TestMeterViews::test_add_duplicate_meter PASSED [ 46%]
+apps/meters/tests/test_meters.py::TestMeterViews::test_retrieve_meter PASSED [ 48%]
+apps/meters/tests/test_meters.py::TestMeterViews::test_soft_delete_meter PASSED [ 49%]
+apps/meters/tests/test_meters.py::TestMeterViews::test_validate_endpoint PASSED [ 50%]
+apps/meters/tests/test_meters.py::TestMeterViews::test_validate_endpoint_empty_body PASSED [ 51%]
+apps/notifications/tests/test_notifications.py::TestNotificationServices::test_send_whatsapp_not_configured PASSED [ 53%]
+apps/notifications/tests/test_notifications.py::TestNotificationServices::test_send_push_no_firebase PASSED [ 54%]
+apps/notifications/tests/test_notifications.py::TestNotificationTasks::test_sms_task_skips_unconfigured PASSED [ 55%]
+apps/notifications/tests/test_notifications.py::TestNotificationTasks::test_push_task_skips_unconfigured PASSED [ 56%]
+apps/payments/tests/test_payments.py::TestPaymentServices::test_initiate_payment_success PASSED [ 57%]
+apps/payments/tests/test_payments.py::TestPaymentServices::test_initiate_payment_invalid_meter PASSED [ 59%]
+apps/payments/tests/test_payments.py::TestPaymentServices::test_initiate_payment_unauthenticated PASSED [ 60%]
+apps/payments/tests/test_payments.py::TestPaymentServices::test_initiate_payment_empty_body PASSED [ 61%]
+apps/payments/tests/test_payments.py::TestPaymentServices::test_verify_payment_success PASSED [ 62%]
+apps/payments/tests/test_payments.py::TestPaymentServices::test_verify_payment_failed PASSED [ 63%]
+apps/payments/tests/test_payments.py::TestPaymentServices::test_verify_payment_no_reference PASSED [ 65%]
+apps/payments/tests/test_payments.py::TestPaystackWebhook::test_webhook_invalid_signature PASSED [ 66%]
+apps/payments/tests/test_payments.py::TestPaystackWebhook::test_webhook_valid_signature PASSED [ 67%]
+apps/transactions/tests/test_tasks.py::TestTransactionTasks::test_request_disco_token_task_success PASSED [ 68%]
+apps/transactions/tests/test_tasks.py::TestTransactionTasks::test_request_disco_token_task_failure FAILED [ 69%]
+apps/transactions/tests/test_tasks.py::TestTransactionTasks::test_request_token_from_disco_http_success FAILED [ 71%]
+apps/transactions/tests/test_tasks.py::TestTransactionTasks::test_request_token_from_disco_http_failure FAILED [ 72%]
+apps/transactions/tests/test_tasks.py::TestTransactionTasks::test_request_token_from_disco_test_mode PASSED [ 73%]
+apps/transactions/tests/test_transactions.py::TestTransactionServices::test_generate_reference_format PASSED [ 74%]
+apps/transactions/tests/test_transactions.py::TestTransactionServices::test_generate_reference_unique PASSED [ 75%]
+apps/transactions/tests/test_transactions.py::TestTransactionServices::test_create_transaction PASSED [ 77%]
+apps/transactions/tests/test_transactions.py::TestTransactionServices::test_confirm_payment PASSED [ 78%]
+apps/transactions/tests/test_transactions.py::TestTransactionServices::test_fail_payment PASSED [ 79%]
+apps/transactions/tests/test_transactions.py::TestTransactionServices::test_encrypt_decrypt_token_roundtrip PASSED [ 80%]
+apps/transactions/tests/test_transactions.py::TestTransactionServices::test_store_token PASSED [ 81%]
+apps/transactions/tests/test_transactions.py::TestTransactionServices::test_fail_token PASSED [ 83%]
+apps/transactions/tests/test_transactions.py::TestTransactionModel::test_total_amount PASSED [ 84%]
+apps/transactions/tests/test_transactions.py::TestTransactionModel::test_can_resend_token_eligible PASSED [ 85%]
+apps/transactions/tests/test_transactions.py::TestTransactionModel::test_can_resend_token_max_attempts PASSED [ 86%]
+apps/transactions/tests/test_transactions.py::TestTransactionModel::test_can_resend_token_not_paid PASSED [ 87%]
+apps/transactions/tests/test_transactions.py::TestTransactionViews::test_list_transactions PASSED [ 89%]
+apps/transactions/tests/test_transactions.py::TestTransactionViews::test_list_transactions_unauthenticated PASSED [ 90%]
+apps/transactions/tests/test_transactions.py::TestTransactionViews::test_transaction_detail PASSED [ 91%]
+apps/transactions/tests/test_transactions.py::TestTransactionViews::test_transaction_detail_not_found PASSED [ 92%]
+apps/transactions/tests/test_transactions.py::TestTransactionViews::test_resend_token_unpaid PASSED [ 93%]
+apps/transactions/tests/test_transactions.py::TestTransactionViews::test_resend_token_eligible PASSED [ 95%]
+apps/admin_panel/tests/test_admin_panel.py::TestAuditLogMiddleware::test_middleware_attaches_ip PASSED [ 96%]
+apps/admin_panel/tests/test_admin_panel.py::TestAuditLogMiddleware::test_middleware_x_forwarded_for PASSED [ 97%]
+apps/chat/tests/test_chat.py::TestKnowledge::test_faq_not_empty PASSED   [ 98%]
+.\venv\Scripts\pytest 
+: C:\Users\muhammad\Ele
+ctricity Token 
+Internediary System\bac
+kend\venv\Lib\site-pack
+ages\pytest_cov\plugin.
+py:355: 
+CovFailUnderWarning: 
+Coverage failure: 
+total of 70 is less 
+than fail-under=80
+At line:1 char:1
++ 
+.\venv\Scripts\pytest 
+apps -v --tb=short --ds
+=config.settings.testin
+g ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (C:\Users\muha   
+ mm...n fail-under=    
+80:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+  warnings.warn(CovFail
+UnderWarning(message), 
+stacklevel=1)
+apps/chat/tests/test_chat.py::TestKnowledge::test_build_faq_section PASSED [100%]
+ERROR: Coverage failure: total of 70 is less than fail-under=80
+
+
+================================== FAILURES ===================================
+_________ TestTransactionTasks.test_request_disco_token_task_failure __________
+apps\transactions\tests\test_tasks.py:44: in test_request_disco_token_task_failure
+    request_disco_token_task(str(paid_transaction.id))
+venv\Lib\site-packages\celery\local.py:182: in __call__
+    return self._get_current_object()(*a, **kw)
+venv\Lib\site-packages\celery\app\task.py:411: in __call__
+    return self.run(*args, **kwargs)
+apps\transactions\tasks.py:331: in request_disco_token_task
+    raise self.retry(exc=Exception(error))
+venv\Lib\site-packages\celery\app\task.py:720: in retry
+    raise_with_context(exc or Retry('Task can be retried', None))
+venv\Lib\site-packages\celery\utils\serialization.py:273: in raise_with_context
+    raise exc from exc_info[1]
+E   Exception: Timeout from VTPass
+------------------------------ Captured log call ------------------------------
+WARNING  apps.transactions.tasks:tasks.py:325 DISCO token request failed for ETIP-A1F1C4037743 (attempt 1/4): Timeout from VTPass
+_______ TestTransactionTasks.test_request_token_from_disco_http_success _______
+apps\transactions\tests\test_tasks.py:67: in test_request_token_from_disco_http_success
+    assert res["success"] is True
+E   assert False is True
+_______ TestTransactionTasks.test_request_token_from_disco_http_failure _______
+apps\transactions\tests\test_tasks.py:85: in test_request_token_from_disco_http_failure
+    assert res["error"] == "Failed transaction"
+E   AssertionError: assert 'VTPass API error: HTTP 401' == 'Failed transaction'
+E     
+E     - Failed transaction
+E     + VTPass API error: HTTP 401
+
+---------- coverage: platform win32, python 3.14.2-final-0 -----------
+Name                                                              Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------
+apps\__init__.py                                                      0      0   100%
+apps\accounts\__init__.py                                             0      0   100%
+apps\accounts\admin.py                                               19      0   100%
+apps\accounts\apps.py                                                 5      0   100%
+apps\accounts\migrations\0001_initial.py                              8      0   100%
+apps\accounts\migrations\0002_email_primary_whatsapp_number.py       10      2    80%   19-20
+apps\accounts\migrations\__init__.py                                  0      0   100%
+apps\accounts\models.py                                             101      2    98%   152, 170
+apps\accounts\serializers.py                                         92     36    61%   18-24, 29-36, 52, 56-58, 70, 73-75, 78, 86, 112, 115, 124, 139-143, 146-155
+apps\accounts\services.py                                            95     77    19%   38-53, 62-85, 96-120, 132-140, 152-154, 164-175, 188-195, 205-230, 238-259, 278
+apps\accounts\tests\__init__.py                                       0      0   100%
+apps\accounts\tests\test_accounts.py                                 85      0   100%
+apps\accounts\urls.py                                                 4      0   100%
+apps\accounts\views.py                                              144     63    56%   136-163, 195-216, 271-272, 278, 284, 337-353, 408-424, 458-463, 486-498
+apps\admin_panel\__init__.py                                          0      0   100%
+apps\admin_panel\admin.py                                            21      2    90%   32, 35
+apps\admin_panel\apps.py                                              5      0   100%
+apps\admin_panel\middleware.py                                       16      0   100%
+apps\admin_panel\migrations\0001_initial.py                           8      0   100%
+apps\admin_panel\migrations\__init__.py                               0      0   100%
+apps\admin_panel\models.py                                           57     14    75%   18-24, 59, 63, 66-67, 70-71, 117
+apps\admin_panel\serializers.py                                     108     17    84%   41-45, 88-90, 138-139, 176-178, 182-185
+apps\admin_panel\tests\__init__.py                                    0      0   100%
+apps\admin_panel\tests\test_admin_panel.py                           87      0   100%
+apps\admin_panel\urls.py                                              3      0   100%
+apps\admin_panel\views.py                                           281    121    57%   120-147, 160-202, 213-225, 243, 279, 285-286, 305-331, 354, 358-359, 401-427, 452, 459, 464, 468, 472, 476, 504-517, 540, 544-545, 594-627, 652, 658, 662, 690-696, 716-730
+apps\chat\__init__.py                                                 0      0   100%
+apps\chat\admin.py                                                   23      2    91%   19, 30
+apps\chat\apps.py                                                     5      0   100%
+apps\chat\knowledge.py                                                7      0   100%
+apps\chat\migrations\0001_initial.py                                  8      0   100%
+apps\chat\migrations\__init__.py                                      0      0   100%
+apps\chat\models.py                                                  30      2    93%   60-61
+apps\chat\serializers.py                                              9      0   100%
+apps\chat\services.py                                               134    111    17%   150-153, 163-236, 245-262, 268-284, 288-295, 298-302, 309-331, 334-338, 347-369, 379
+apps\chat\tests\__init__.py                                           0      0   100%
+apps\chat\tests\test_chat.py                                         55      0   100%
+apps\chat\urls.py                                                     3      0   100%
+apps\chat\views.py                                                   45      4    91%   46-48, 84
+apps\meters\__init__.py                                               0      0   100%
+apps\meters\admin.py                                                 15      0   100%
+apps\meters\apps.py                                                   5      0   100%
+apps\meters\management\__init__.py                                    0      0   100%
+apps\meters\management\commands\__init__.py                           0      0   100%
+apps\meters\management\commands\purge_invalid_meters.py              76     76     0%   14-166
+apps\meters\migrations\0001_initial.py                                8      0   100%
+apps\meters\migrations\0002_add_ikedc_aba_disco_providers.py          4      0   100%
+apps\meters\migrations\0003_rename_kano_to_kedco.py                   4      0   100%
+apps\meters\migrations\0004_meterinquiry.py                           6      0   100%
+apps\meters\migrations\__init__.py                                    0      0   100%
+apps\meters\models.py                                                42      1    98%   73
+apps\meters\models_inquiry.py                                        14      1    93%   21
+apps\meters\serializers.py                                           55      9    84%   70, 96, 109, 117-122
+apps\meters\serializers_inquiry.py                                    7      0   100%
+apps\meters\services.py                                              70     55    21%   33, 38-39, 48, 71-149, 180-217
+apps\meters\tests\__init__.py                                         0      0   100%
+apps\meters\tests\test_meters.py                                     55      0   100%
+apps\meters\urls.py                                                   7      0   100%
+apps\meters\views.py                                                 42      5    88%   108-111, 165
+apps\meters\views_inquiry.py                                         16      5    69%   14-17, 20
+apps\notifications\__init__.py                                        0      0   100%
+apps\notifications\apps.py                                            5      0   100%
+apps\notifications\migrations\__init__.py                             0      0   100%
+apps\notifications\services.py                                       47     29    38%   41-62, 82-100
+apps\notifications\tasks.py                                          25      6    76%   23-25, 38-40
+apps\notifications\tests\__init__.py                                  0      0   100%
+apps\notifications\tests\test_notifications.py                       27      0   100%
+apps\payments\__init__.py                                             0      0   100%
+apps\payments\admin.py                                                0      0   100%
+apps\payments\apps.py                                                 5      0   100%
+apps\payments\migrations\__init__.py                                  0      0   100%
+apps\payments\serializers.py                                         19      2    89%   32, 36
+apps\payments\services.py                                           127     60    53%   66, 80-88, 96-138, 147-165, 197, 206-208, 239-242, 256-257, 261, 290-308, 322-323, 328
+apps\payments\tests\__init__.py                                       0      0   100%
+apps\payments\tests\test_payments.py                                 67      0   100%
+apps\payments\urls.py                                                 3      0   100%
+apps\payments\views.py                                               56      7    88%   141-148, 192-193
+apps\payments\webhook_urls.py                                         3      0   100%
+apps\transactions\__init__.py                                         0      0   100%
+apps\transactions\admin.py                                           10      0   100%
+apps\transactions\apps.py                                             5      0   100%
+apps\transactions\management\__init__.py                              0      0   100%
+apps\transactions\management\commands\__init__.py                     0      0   100%
+apps\transactions\management\commands\deliver_pending_tokens.py      29     29     0%   9-67
+apps\transactions\migrations\0001_initial.py                          8      0   100%
+apps\transactions\migrations\__init__.py                              0      0   100%
+apps\transactions\models.py                                          57      1    98%   116
+apps\transactions\serializers.py                                     45      6    87%   89-90, 130-135
+apps\transactions\services.py                                        83     18    78%   24, 37-39, 162-182, 205
+apps\transactions\tasks.py                                          163     91    44%   61-77, 125, 129, 154-178, 186, 189-190, 200-256, 273-275, 279-280, 282-283, 315-323, 334-335, 359-360, 365-374, 378-386, 391-431
+apps\transactions\tests\__init__.py                                   0      0   100%
+apps\transactions\tests\test_tasks.py                                51      4    92%   46-48, 68
+apps\transactions\tests\test_transactions.py                         91      0   100%
+apps\transactions\urls.py                                             3      0   100%
+apps\transactions\views.py                                           49      6    88%   95-99, 137
+-----------------------------------------------------------------------------------------------
+TOTAL                                                              2872    864    70%
+Coverage HTML written to dir htmlcov
+
+FAIL Required test coverage of 80% not reached. Total coverage: 69.92%
+=========================== short test summary info ===========================
+FAILED apps/transactions/tests/test_tasks.py::TestTransactionTasks::test_request_disco_token_task_failure - Exception: Timeout from VTPass
+FAILED apps/transactions/tests/test_tasks.py::TestTransactionTasks::test_request_token_from_disco_http_success - assert False is True
+FAILED apps/transactions/tests/test_tasks.py::TestTransactionTasks::test_request_token_from_disco_http_failure - AssertionError: assert 'VTPass API error: HTTP 401' == 'Failed transaction'
+  
+  - Failed transaction
+  + VTPass API error: HTTP 401
+======================== 3 failed, 80 passed in 10.96s ========================

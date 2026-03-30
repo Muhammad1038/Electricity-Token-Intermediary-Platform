@@ -28,6 +28,23 @@ HTTP_TIMEOUT = 15       # seconds — for initiate calls
 VERIFY_TIMEOUT = 30    # seconds — verify needs more time; payment already made
 SERVICE_FEE_RATE = Decimal("0.00")  # 0% for MVP — change later
 
+# Minimum purchase amounts per DISCO (VTPass sandbox enforces these)
+DISCO_MINIMUMS: dict[str, Decimal] = {
+    "IBEDC":  Decimal("1500"),  # Ibadan
+    "KAEDCO": Decimal("1500"),  # Kaduna
+    "EEDC":   Decimal("1000"),  # Enugu
+    "EKEDC":  Decimal("1000"),  # Eko
+    "IKEDC":  Decimal("1000"),  # Ikeja
+    "AEDC":   Decimal("1000"),  # Abuja
+    "KEDCO":  Decimal("1000"),  # Kano
+    "JED":    Decimal("1000"),  # Jos
+    "YEDC":   Decimal("1000"),  # Yola
+    "PHED":   Decimal("1000"),  # Port Harcourt
+    "BEDC":   Decimal("1000"),  # Benin
+    "ABA":    Decimal("1000"),  # Aba
+}
+DEFAULT_MIN = Decimal("1000")  # fallback for unknown DISCOs
+
 
 # ━━ Helpers ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -182,6 +199,16 @@ def initiate_payment(user, meter_id, amount: Decimal, payment_gateway: str, ip_a
             "Please update your profile with a valid email."
         )
     email = user.email
+
+    # Enforce per-DISCO minimum purchase amount before charging the user
+    # (skipped in test mode — any amount is fine for sandbox testing)
+    if not getattr(settings, "VTPASS_TEST_MODE", False):
+        disco_min = DISCO_MINIMUMS.get(meter.disco, DEFAULT_MIN)
+        if amount < disco_min:
+            raise ValueError(
+                f"Minimum purchase amount for {meter.disco} is "
+                f"\u20a6{disco_min:,.0f}. You entered \u20a6{amount:,.0f}."
+            )
 
     fee = _service_fee(amount)
     total = amount + fee
