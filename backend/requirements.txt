@@ -68,3 +68,7 @@ httpretty==1.1.4
 black==24.10.0
 flake8==7.1.1
 isort==5.13.2
+
+# Production server
+gunicorn==23.0.0
+whitenoise==6.8.2
