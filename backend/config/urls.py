@@ -2,6 +2,7 @@
 ETIP Backend — Root URL Configuration
 """
 from django.contrib import admin
+from django.http import JsonResponse
 from django.urls import include, path
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -10,6 +11,9 @@ from drf_spectacular.views import (
 )
 
 urlpatterns = [
+    # Health check for Render
+    path("health", lambda r: JsonResponse({"status": "ok"})),
+
     # Django admin (internal)
     path("django-admin/", admin.site.urls),
 
