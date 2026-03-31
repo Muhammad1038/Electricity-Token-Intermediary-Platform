@@ -35,6 +35,7 @@ google-genai>=1.0.0
 cryptography==44.0.0
 
 # PDF generation (receipts) — cross-platform
+python-bidi==0.4.2
 xhtml2pdf==0.2.16
 
 # Notifications
