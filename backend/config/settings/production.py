@@ -3,7 +3,18 @@ ETIP Backend — Production Settings (Render)
 """
 from .base import *  # noqa
 
+import dj_database_url
+
 DEBUG = False
+
+# ── Database ──────────────────────────────────────────────────────────────────
+# Render provides the DATABASE_URL environment variable
+DATABASES = {
+    "default": dj_database_url.config(
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
+}
 
 # Render provides the RENDER_EXTERNAL_HOSTNAME env var
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=[])
