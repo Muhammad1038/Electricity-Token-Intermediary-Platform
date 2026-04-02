@@ -11,7 +11,8 @@ from drf_spectacular.views import (
 )
 
 urlpatterns = [
-    # Health checks for Render
+    # Health checks for Render (must respond 200 or service is marked down)
+    path("", lambda r: JsonResponse({"status": "ok", "message": "ETIP API is live"})),
     path("health/", lambda r: JsonResponse({"status": "ok"})),
     path("health", lambda r: JsonResponse({"status": "ok"})),
 
