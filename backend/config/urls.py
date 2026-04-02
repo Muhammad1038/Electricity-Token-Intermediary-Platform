@@ -12,7 +12,7 @@ from drf_spectacular.views import (
 
 urlpatterns = [
     # Health checks for Render
-    path("", lambda r: JsonResponse({"status": "ok", "message": "ETIP API is live"})),
+    path("health/", lambda r: JsonResponse({"status": "ok"})),
     path("health", lambda r: JsonResponse({"status": "ok"})),
 
     # Django admin (internal)

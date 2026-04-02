@@ -6,6 +6,7 @@ from .base import *  # noqa
 import dj_database_url
 
 DEBUG = False
+APPEND_SLASH = False  # Prevents 301 redirects that Android blocks on POST requests
 
 # ── Database ──────────────────────────────────────────────────────────────────
 # Render provides the DATABASE_URL environment variable
@@ -43,9 +44,9 @@ MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 # ── Email ──────────────────────────────────────────────────────────────────────
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-# ── CORS — allow your mobile app & admin dashboard ────────────────────────────
-CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
+# ── CORS — allow mobile app access ────────────────────────────────────────────
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
 # ── Logging ────────────────────────────────────────────────────────────────────
 LOGGING = {
