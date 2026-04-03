@@ -7,13 +7,6 @@ from rest_framework import serializers
 from .models import DISCOProvider, MeterProfile, MeterType
 
 
-class MeterValidationRequestSerializer(serializers.Serializer):
-    """Used for the standalone /validate/ endpoint (no save)."""
-
-    meter_number = serializers.CharField(max_length=20)
-    disco = serializers.ChoiceField(choices=DISCOProvider.choices)
-
-
 class MeterValidationResultSerializer(serializers.Serializer):
     """Read-only: what the DISCO API returns after validation."""
 
@@ -23,6 +16,18 @@ class MeterValidationResultSerializer(serializers.Serializer):
     meter_address = serializers.CharField()
     meter_type = serializers.CharField()
     is_valid = serializers.BooleanField()
+
+
+class MeterValidationRequestSerializer(serializers.Serializer):
+    """Used for the standalone /validate/ endpoint (no save)."""
+
+    meter_number = serializers.CharField(max_length=20)
+    disco = serializers.ChoiceField(choices=DISCOProvider.choices)
+
+    def validate_meter_number(self, value):
+        if len(value) not in [11, 13] or not value.isdigit():
+            raise serializers.ValidationError("Meter number must be exactly 11 or 13 digits and contain only numbers.")
+        return value
 
 
 class MeterProfileSerializer(serializers.ModelSerializer):
@@ -56,6 +61,11 @@ class MeterProfileSerializer(serializers.ModelSerializer):
             "disco_display",
             "meter_type_display",
         ]
+
+    def validate_meter_number(self, value):
+        if len(value) not in [11, 13] or not value.isdigit():
+            raise serializers.ValidationError("Meter number must be exactly 11 or 13 digits and contain only numbers.")
+        return value
 
     def validate(self, attrs):
         user = self.context["request"].user
