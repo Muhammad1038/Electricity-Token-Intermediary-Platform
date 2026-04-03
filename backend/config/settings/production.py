@@ -74,3 +74,14 @@ LOGGING = {
         "celery": {"handlers": ["console"], "level": "INFO", "propagate": False},
     },
 }
+
+# ── Redis Fallback ─────────────────────────────────────────────────────────────
+# If Render doesn't have a Redis instance configured (still pointing to localhost),
+# fallback to Local Memory Cache to prevent ConnectionRefused errors.
+if "localhost" in env("REDIS_URL", default="localhost") or "127.0.0.1" in env("REDIS_URL", default="127.0.0.1"):
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "etip-production-cache",
+        }
+    }
