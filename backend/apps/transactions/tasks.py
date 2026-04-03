@@ -103,12 +103,15 @@ def _request_token_from_disco(
     base_url   = getattr(settings, "VTPASS_BASE_URL",   "https://vtpass.com/api")
 
     # ── Test-mode stub: instant token without contacting VTPass ──────────────
-    if getattr(settings, "VTPASS_TEST_MODE", False):
+    is_test_mode = getattr(settings, "VTPASS_TEST_MODE", False)
+    is_sandbox_meter = str(meter_number).startswith("1111")
+    
+    if is_test_mode or is_sandbox_meter:
         import random, string
         fake_token = "".join(random.choices(string.digits, k=20))
         logger.info(
-            "[TEST MODE] Returning instant stub token for %s / %s",
-            disco, reference,
+            "[SANDBOX MODE] Returning instant stub token for %s / %s (Meter: %s)",
+            disco, reference, meter_number
         )
         return {
             "success": True,
