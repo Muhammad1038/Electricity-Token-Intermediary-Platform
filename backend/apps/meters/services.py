@@ -72,8 +72,25 @@ def _call_vtpass_verify(meter_number: str, disco: str, meter_type: str = "prepai
     secret_key = getattr(settings, "VTPASS_SECRET_KEY", "")
     service_id = _vtpass_service_id(disco)
 
-    # Hard fail if VTPass is not configured — no sandbox fallback in production.
+    # ── Sandbox / Test Mode Fallback ──────────────────────────────────────────
+    is_test_mode = getattr(settings, "VTPASS_TEST_MODE", False)
+    is_test_meter = meter_number.startswith("1111")
+
+    # If keys are missing OR we are explicitly in test mode, allow test meters to pass.
+    if (not api_key or not secret_key or is_test_mode) and is_test_meter:
+        logger.info("VTPass: Using SANDBOX mock for test meter %s", meter_number)
+        return {
+            "is_valid": True,
+            "meter_owner_name": f"TEST CUSTOMER ({disco})",
+            "meter_address": "123 Sandbox Avenue, ETIP Test City",
+            "meter_type": meter_type.upper(),
+            "min_purchase_amount": 500,
+            "outstanding": 0,
+        }
+
+    # Hard fail if VTPass is not configured and it's not a test meter — no sandbox fallback.
     if not api_key or not secret_key:
+        logger.error("VTPass credentials missing while validating non-test meter.")
         raise RuntimeError(
             "VTPass credentials (VTPASS_API_KEY / VTPASS_SECRET_KEY) are not configured."
         )
