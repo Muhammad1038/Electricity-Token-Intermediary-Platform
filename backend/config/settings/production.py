@@ -85,3 +85,9 @@ if "localhost" in env("REDIS_URL", default="localhost") or "127.0.0.1" in env("R
             "LOCATION": "etip-production-cache",
         }
     }
+    # ── Celery Sandbox Fallback ────────────────────────────────────────────────
+    # Run tasks immediately in the same process since no Redis worker exists.
+    CELERY_TASK_ALWAYS_EAGER = True
+    CELERY_TASK_EAGER_PROPAGATES = True
+    CELERY_BROKER_URL = "memory://"
+    CELERY_RESULT_BACKEND = "cache+locmem://"
